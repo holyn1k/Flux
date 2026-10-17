@@ -157,11 +157,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  String _countryDisplayName(CountryName country) {
-    final lang = Localizations.localeOf(context).languageCode;
-    return country.displayName(lang);
-  }
-
   String _phoneMaskHint(CountryName country) {
     return country.phoneMask.replaceAll('#', '0');
   }
@@ -790,19 +785,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                 GestureDetector(
                                   behavior: HitTestBehavior.opaque,
                                   onTap: _onLogoTap,
-                                  child: Image.asset(
-                                    'assets/komet.png',
-                                    height: 80,
-                                    color: cs.onSurface,
+                                  child: Text(
+                                    'flux',
+                                    style: TextStyle(
+                                      color: cs.onSurface,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -1.5,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 48),
                                 Text(
-                                  l10n.loginTitle,
+                                  '${l10n.loginTitle.toUpperCase()} :',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: cs.onSurface,
-                                    fontSize: 32,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w500,
+                                    letterSpacing: 1.0,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -811,101 +812,109 @@ class _LoginScreenState extends State<LoginScreen> {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: cs.onSurfaceVariant,
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w400,
-                                    height: 1.4,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 48),
-                          InkWell(
-                            onTap: _showCountryPicker,
-                            borderRadius: BorderRadius.circular(50),
-                            child: _buildInputField(
-                              label: l10n.loginCountry,
-                              content: Row(
-                                children: [
-                                  Text(
-                                    _countryDisplayName(_selectedCountry),
-                                    style: TextStyle(
-                                      color: cs.onSurface,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Icon(
-                                    Symbols.keyboard_arrow_down,
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 40),
-                          _buildInputField(
-                            label: l10n.loginPhoneNumber,
-                            content: Row(
-                              children: [
-                                Text(
-                                  _selectedCountry.phoneCode,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4.0, bottom: 4.0),
+                                child: Text(
+                                  l10n.loginCountry.toUpperCase(),
                                   style: TextStyle(
-                                    color: cs.onSurface,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
+                                    color: cs.onSurfaceVariant,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                Container(
-                                  width: 1,
-                                  height: 24,
-                                  color: cs.outlineVariant,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: TextField(
-                                    key: ValueKey(_selectedCountry.code),
-                                    controller: _phoneController,
-                                    keyboardType: TextInputType.phone,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      PhoneInputFormatter(_selectedCountry),
-                                    ],
-                                    style: TextStyle(
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
                                       color: cs.onSurface,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
+                                      width: 1.0,
                                     ),
-                                    decoration: InputDecoration(
-                                      hintText: _phoneMaskHint(
-                                        _selectedCountry,
-                                      ),
-                                      hintStyle: TextStyle(
-                                        color: cs.outline,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                    onChanged: (value) {
-                                      final digits = value.replaceAll(
-                                        RegExp(r'\D'),
-                                        '',
-                                      );
-                                      setState(() {
-                                        _isPhoneValid =
-                                            digits.length ==
-                                            _selectedCountry.phoneDigits;
-                                      });
-                                    },
                                   ),
                                 ),
-                              ],
-                            ),
+                                child: Row(
+                                  children: [
+                                    InkWell(
+                                      onTap: _showCountryPicker,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              _selectedCountry.phoneCode,
+                                              style: TextStyle(
+                                                color: cs.onSurface,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Icon(
+                                              Symbols.keyboard_arrow_down,
+                                              color: cs.onSurfaceVariant,
+                                              size: 20,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: TextField(
+                                        key: ValueKey(_selectedCountry.code),
+                                        controller: _phoneController,
+                                        keyboardType: TextInputType.phone,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly,
+                                          PhoneInputFormatter(_selectedCountry),
+                                        ],
+                                        style: TextStyle(
+                                          color: cs.onSurface,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400,
+                                          letterSpacing: 2.0,
+                                        ),
+                                        decoration: InputDecoration(
+                                          hintText: _phoneMaskHint(_selectedCountry),
+                                          hintStyle: TextStyle(
+                                            color: cs.outline,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400,
+                                            letterSpacing: 2.0,
+                                          ),
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+                                        ),
+                                        onChanged: (value) {
+                                          final digits = value.replaceAll(
+                                            RegExp(r'\D'),
+                                            '',
+                                          );
+                                          setState(() {
+                                            _isPhoneValid =
+                                                digits.length ==
+                                                _selectedCountry.phoneDigits;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           AnimatedSize(
@@ -942,76 +951,70 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const Spacer(),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 24.0),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        color: cs.onSurface,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        height: 1.4,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: l10n.loginTermsIntro,
-                                          style: TextStyle(
-                                            color: cs.onSurface,
-                                            fontSize: 14,
-                                            height: 1.4,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: l10n.loginTermsLink,
-                                          style: TextStyle(
-                                            color: cs.primary,
-                                            fontSize: 14,
-                                            height: 1.4,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          recognizer: TapGestureRecognizer()
-                                            ..onTap = () => _showTOS(context),
-                                        ),
-                                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 24.0),
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                style: TextStyle(
+                                  color: cs.onSurfaceVariant,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.4,
+                                ),
+                                children: [
+                                  TextSpan(text: l10n.loginTermsIntro),
+                                  TextSpan(
+                                    text: l10n.loginTermsLink,
+                                    style: TextStyle(
+                                      color: cs.primary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      decoration: TextDecoration.underline,
                                     ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => _showTOS(context),
                                   ),
-                                ),
+                                ],
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: FloatingActionButton(
-                                  onPressed: !_isPhoneValid
-                                      ? null
-                                      : (_isOnline
-                                            ? _validateAndSubmit
-                                            : _notifyConnecting),
-                                  backgroundColor: _isPhoneValid
-                                      ? cs.primaryContainer
-                                      : cs.surfaceContainerHighest,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: _isPhoneValid && !_isOnline
-                                      ? SmallSpinner(
-                                          size: 24,
-                                          color: cs.onPrimaryContainer,
-                                        )
-                                      : Icon(
-                                          Symbols.arrow_forward,
-                                          color: _isPhoneValid
-                                              ? cs.onPrimaryContainer
-                                              : cs.onSurfaceVariant,
-                                        ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                          const SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 24.0),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: FilledButton(
+                                onPressed: !_isPhoneValid
+                                    ? null
+                                    : (_isOnline
+                                          ? _validateAndSubmit
+                                          : _notifyConnecting),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: cs.onSurface,
+                                  foregroundColor: cs.surface,
+                                  disabledBackgroundColor: cs.onSurface.withValues(alpha: 0.12),
+                                  disabledForegroundColor: cs.onSurface.withValues(alpha: 0.38),
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: _isPhoneValid && !_isOnline
+                                    ? SmallSpinner(
+                                        size: 20,
+                                        color: cs.surface,
+                                      )
+                                    : Text(
+                                        l10n.loginDone.toUpperCase(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 1.0,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1022,46 +1025,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildInputField({required String label, required Widget content}) {
-    final cs = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              width: double.infinity,
-              height: 54,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                border: Border.all(color: cs.primary, width: 1.5),
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: content,
-            ),
-            Positioned(
-              top: -10,
-              left: 20,
-              child: Container(
-                color: cs.surface,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: cs.primary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
