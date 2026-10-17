@@ -129,25 +129,25 @@ class _Password2FAScreenState extends State<Password2FAScreen>
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
               Text(
-                'Двухфакторная аутентификация',
+                AppLocalizations.of(context)!.passwordEntryTitle,
                 style: TextStyle(
                   color: cs.onSurface,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.5,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
-                'Введите пароль для завершения входа',
+                AppLocalizations.of(context)!.passwordEntrySubtitle,
                 style: TextStyle(
-                  color: cs.outline,
-                  fontSize: 15,
+                  color: cs.onSurfaceVariant,
+                  fontSize: 14,
                   fontWeight: FontWeight.w400,
                   height: 1.4,
                 ),
@@ -158,64 +158,98 @@ class _Password2FAScreenState extends State<Password2FAScreen>
                   'Подсказка: ${widget.hint}',
                   style: TextStyle(
                     color: cs.tertiary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
-              const SizedBox(height: 24),
-              TextField(
-                controller: _passwordController,
-                obscureText: !_isPasswordVisible,
-                autofocus: true,
-                enabled: !_isLoading,
-                decoration: InputDecoration(
-                  hintText: 'Пароль',
-                  filled: true,
-                  fillColor: cs.surfaceContainerHigh,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: AnimatedSlashIcon(
-                      icon: Symbols.visibility,
-                      slashedIcon: Symbols.visibility_off,
-                      slashed: _isPasswordVisible,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
-                  ),
-                ),
-                onSubmitted: (_) => _checkPassword(),
-              ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              const SizedBox(height: 32),
+              Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  FloatingActionButton(
-                    onPressed: _isLoading ? null : _checkPassword,
-                    backgroundColor: _passwordController.text.isNotEmpty
-                        ? cs.primaryContainer
-                        : cs.surfaceContainerHighest,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                  Container(
+                    width: double.infinity,
+                    height: 54,
+                    padding: const EdgeInsets.only(left: 16, right: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: cs.outlineVariant, width: 1),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: _isLoading
-                        ? SmallSpinner(size: 24, color: cs.onPrimaryContainer)
-                        : Icon(
-                            Symbols.arrow_forward,
-                            color: _passwordController.text.isNotEmpty
-                                ? cs.onPrimaryContainer
-                                : cs.onSurfaceVariant,
+                    alignment: Alignment.centerLeft,
+                    child: TextField(
+                      controller: _passwordController,
+                      obscureText: !_isPasswordVisible,
+                      autofocus: true,
+                      enabled: !_isLoading,
+                      style: TextStyle(color: cs.onSurface, fontSize: 14),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        suffixIcon: IconButton(
+                          icon: AnimatedSlashIcon(
+                            icon: Symbols.visibility,
+                            slashedIcon: Symbols.visibility_off,
+                            slashed: _isPasswordVisible,
+                            color: cs.onSurfaceVariant,
                           ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                      onChanged: (_) => setState(() {}),
+                      onSubmitted: (_) => _checkPassword(),
+                    ),
+                  ),
+                  Positioned(
+                    top: -8,
+                    left: 12,
+                    child: Container(
+                      color: cs.surface,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Text(
+                        AppLocalizations.of(context)!.passwordEntryHint,
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
+              ),
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _passwordController.text.isNotEmpty && !_isLoading
+                      ? _checkPassword
+                      : null,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: cs.onSurface,
+                    foregroundColor: cs.surface,
+                    disabledBackgroundColor: cs.onSurface.withValues(alpha: 0.12),
+                    disabledForegroundColor: cs.onSurface.withValues(alpha: 0.38),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? SmallSpinner(size: 20, color: cs.surface)
+                      : Text(
+                          AppLocalizations.of(context)!.passwordEntryContinue.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                ),
               ),
               const SizedBox(height: 24),
             ],

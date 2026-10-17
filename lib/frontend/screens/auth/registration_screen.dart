@@ -104,30 +104,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _canSubmit ? _submit : null,
-        backgroundColor: _canSubmit
-            ? cs.primaryContainer
-            : cs.surfaceContainerHighest,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        child: _isSubmitting
-            ? SmallSpinner(size: 22, color: cs.onSurfaceVariant)
-            : Icon(
-                Symbols.arrow_forward,
-                color: _canSubmit ? cs.onPrimaryContainer : cs.onSurfaceVariant,
-              ),
-      ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 96),
           children: [
             Text(
               l10n.registrationTitle,
               style: TextStyle(
                 color: cs.onSurface,
-                fontSize: 26,
+                fontSize: 24,
                 fontWeight: FontWeight.w600,
+                letterSpacing: -0.5,
               ),
             ),
             const SizedBox(height: 8),
@@ -135,12 +122,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               l10n.registrationSubtitle,
               style: TextStyle(
                 color: cs.onSurfaceVariant,
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w400,
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 32),
             Center(
               child: Container(
                 width: 96,
@@ -148,8 +135,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: cs.primary.withValues(alpha: 0.5),
-                    width: 2.5,
+                    color: cs.outlineVariant,
+                    width: 1,
                   ),
                 ),
                 child: ClipOval(
@@ -159,88 +146,126 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           fit: BoxFit.cover,
                         )
                       : Container(
-                          color: cs.primaryContainer,
+                          color: cs.surfaceContainerHigh,
                           alignment: Alignment.center,
-                          child: Text(
-                            firstName.isNotEmpty
-                                ? firstName[0].toUpperCase()
-                                : '?',
-                            style: TextStyle(
-                              color: cs.onPrimaryContainer,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Icon(
+                            Symbols.person,
+                            size: 48,
+                            color: cs.onSurfaceVariant,
                           ),
                         ),
                 ),
               ),
             ),
-            const SizedBox(height: 28),
-            _buildTextField(
-              cs,
+            const SizedBox(height: 32),
+            _buildInputField(
               label: l10n.editProfileFirstName,
-              controller: _firstNameController,
-              textInputAction: TextInputAction.next,
+              content: TextField(
+                controller: _firstNameController,
+                enabled: !_isSubmitting,
+                textInputAction: TextInputAction.next,
+                onChanged: (_) => setState(() {}),
+                style: TextStyle(color: cs.onSurface, fontSize: 14),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
             ),
-            const SizedBox(height: 14),
-            _buildTextField(
-              cs,
+            const SizedBox(height: 16),
+            _buildInputField(
               label: l10n.editProfileLastName,
-              controller: _lastNameController,
-              textInputAction: TextInputAction.done,
+              content: TextField(
+                controller: _lastNameController,
+                enabled: !_isSubmitting,
+                textInputAction: TextInputAction.done,
+                onChanged: (_) => setState(() {}),
+                style: TextStyle(color: cs.onSurface, fontSize: 14),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
             ),
             if (widget.presetAvatars.isNotEmpty) ...[
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
               Text(
                 l10n.registrationChooseAvatar,
                 style: TextStyle(
-                  color: cs.onSurface,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  color: cs.onSurfaceVariant,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 16),
               for (final category in widget.presetAvatars)
                 _buildAvatarCategory(cs, category),
             ],
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _canSubmit ? _submit : null,
+                style: FilledButton.styleFrom(
+                  backgroundColor: cs.onSurface,
+                  foregroundColor: cs.surface,
+                  disabledBackgroundColor: cs.onSurface.withValues(alpha: 0.12),
+                  disabledForegroundColor: cs.onSurface.withValues(alpha: 0.38),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isSubmitting
+                    ? SmallSpinner(size: 20, color: cs.surface)
+                    : Text(
+                        l10n.loginDone.toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTextField(
-    ColorScheme cs, {
-    required String label,
-    required TextEditingController controller,
-    required TextInputAction textInputAction,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildInputField({required String label, required Widget content}) {
+    final cs = Theme.of(context).colorScheme;
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 6),
-          child: Text(
-            label,
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+        Container(
+          width: double.infinity,
+          height: 54,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            border: Border.all(color: cs.outlineVariant, width: 1),
+            borderRadius: BorderRadius.circular(12),
           ),
+          alignment: Alignment.centerLeft,
+          child: content,
         ),
-        TextField(
-          controller: controller,
-          enabled: !_isSubmitting,
-          textInputAction: textInputAction,
-          onChanged: (_) => setState(() {}),
-          style: TextStyle(color: cs.onSurface, fontSize: 15),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: cs.surfaceContainerHigh,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
+        Positioned(
+          top: -8,
+          left: 12,
+          child: Container(
+            color: cs.surface,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: cs.onSurfaceVariant,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
@@ -252,16 +277,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 16),
         if (category.name.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 10),
+            padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               category.name,
               style: TextStyle(
                 color: cs.onSurfaceVariant,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ),
@@ -287,8 +311,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: selected ? cs.primary : Colors.transparent,
-                      width: 2.5,
+                      color: selected ? cs.primary : cs.outlineVariant,
+                      width: selected ? 2 : 1,
                     ),
                   ),
                   child: Padding(
@@ -309,6 +333,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             },
           ),
         ),
+        const SizedBox(height: 16),
       ],
     );
   }
