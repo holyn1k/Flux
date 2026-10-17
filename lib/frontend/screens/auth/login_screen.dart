@@ -715,7 +715,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.white,
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onVerticalDragEnd: (details) {
@@ -785,14 +785,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                 GestureDetector(
                                   behavior: HitTestBehavior.opaque,
                                   onTap: _onLogoTap,
-                                  child: Text(
-                                    'flux',
-                                    style: TextStyle(
-                                      color: cs.onSurface,
-                                      fontSize: 40,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: -1.5,
-                                    ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'flux',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -1.5,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Icon(
+                                        Symbols.check_circle,
+                                        color: Colors.blue,
+                                        size: 28,
+                                        fill: 1.0,
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 const SizedBox(height: 48),
@@ -800,7 +812,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   '${l10n.loginTitle.toUpperCase()} :',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: cs.onSurface,
+                                    color: Colors.black,
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
                                     letterSpacing: 1.0,
@@ -811,7 +823,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   l10n.loginSubtitle,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: cs.onSurfaceVariant,
+                                    color: Colors.black54,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -828,7 +840,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   l10n.loginCountry.toUpperCase(),
                                   style: TextStyle(
-                                    color: cs.onSurfaceVariant,
+                                    color: Colors.black54,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
                                     letterSpacing: 0.5,
@@ -839,7 +851,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                     bottom: BorderSide(
-                                      color: cs.onSurface,
+                                      color: Colors.black,
                                       width: 1.0,
                                     ),
                                   ),
@@ -855,7 +867,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             Text(
                                               _selectedCountry.phoneCode,
                                               style: TextStyle(
-                                                color: cs.onSurface,
+                                                color: Colors.black,
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.w400,
                                               ),
@@ -863,7 +875,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             const SizedBox(width: 4),
                                             Icon(
                                               Symbols.keyboard_arrow_down,
-                                              color: cs.onSurfaceVariant,
+                                              color: Colors.black54,
                                               size: 20,
                                             ),
                                           ],
@@ -881,7 +893,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           PhoneInputFormatter(_selectedCountry),
                                         ],
                                         style: TextStyle(
-                                          color: cs.onSurface,
+                                          color: Colors.black,
                                           fontSize: 18,
                                           fontWeight: FontWeight.w400,
                                           letterSpacing: 2.0,
@@ -889,7 +901,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         decoration: InputDecoration(
                                           hintText: _phoneMaskHint(_selectedCountry),
                                           hintStyle: TextStyle(
-                                            color: cs.outline,
+                                            color: Colors.black38,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400,
                                             letterSpacing: 2.0,
@@ -943,7 +955,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Text(
                               l10n.loginOtherSignInMethods,
                               style: TextStyle(
-                                color: cs.primary,
+                                color: Colors.blue,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                                 height: 1.4,
@@ -957,7 +969,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               textAlign: TextAlign.center,
                               text: TextSpan(
                                 style: TextStyle(
-                                  color: cs.onSurfaceVariant,
+                                  color: Colors.black54,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
                                   height: 1.4,
@@ -967,7 +979,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   TextSpan(
                                     text: l10n.loginTermsLink,
                                     style: TextStyle(
-                                      color: cs.primary,
+                                      color: Colors.blue,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                       decoration: TextDecoration.underline,
@@ -990,10 +1002,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ? _validateAndSubmit
                                           : _notifyConnecting),
                                 style: FilledButton.styleFrom(
-                                  backgroundColor: cs.onSurface,
-                                  foregroundColor: cs.surface,
-                                  disabledBackgroundColor: cs.onSurface.withValues(alpha: 0.12),
-                                  disabledForegroundColor: cs.onSurface.withValues(alpha: 0.38),
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  disabledBackgroundColor: Colors.black12,
+                                  disabledForegroundColor: Colors.black38,
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -1002,7 +1014,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: _isPhoneValid && !_isOnline
                                     ? SmallSpinner(
                                         size: 20,
-                                        color: cs.surface,
+                                        color: Colors.white,
                                       )
                                     : Text(
                                         l10n.loginDone.toUpperCase(),

@@ -95,181 +95,251 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final firstName = _firstNameController.text.trim();
 
     return Scaffold(
-      backgroundColor: cs.surface,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Symbols.arrow_back, color: cs.onSurfaceVariant),
-          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
-        ),
-      ),
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 96),
-          children: [
-            Text(
-              l10n.registrationTitle,
-              style: TextStyle(
-                color: cs.onSurface,
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.registrationSubtitle,
-              style: TextStyle(
-                color: cs.onSurfaceVariant,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 32),
-            Center(
-              child: Container(
-                width: 96,
-                height: 96,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: cs.outlineVariant,
-                    width: 1,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
                   ),
-                ),
-                child: ClipOval(
-                  child: _selectedAvatarUrl != null
-                      ? CachedNetworkImage(
-                          imageUrl: _selectedAvatarUrl!,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          color: cs.surfaceContainerHigh,
-                          alignment: Alignment.center,
-                          child: Icon(
-                            Symbols.person,
-                            size: 48,
-                            color: cs.onSurfaceVariant,
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 44),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                              icon: Icon(
+                                Symbols.arrow_back,
+                                color: Colors.black54,
+                                weight: 400,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        Center(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'flux',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -1.5,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Symbols.check_circle,
+                                    color: Colors.blue,
+                                    size: 28,
+                                    fill: 1.0,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 48),
+                              Text(
+                                '${l10n.registrationTitle.toUpperCase()} :',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                l10n.registrationSubtitle,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-            _buildInputField(
-              label: l10n.editProfileFirstName,
-              content: TextField(
-                controller: _firstNameController,
-                enabled: !_isSubmitting,
-                textInputAction: TextInputAction.next,
-                onChanged: (_) => setState(() {}),
-                style: TextStyle(color: cs.onSurface, fontSize: 14),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildInputField(
-              label: l10n.editProfileLastName,
-              content: TextField(
-                controller: _lastNameController,
-                enabled: !_isSubmitting,
-                textInputAction: TextInputAction.done,
-                onChanged: (_) => setState(() {}),
-                style: TextStyle(color: cs.onSurface, fontSize: 14),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            ),
-            if (widget.presetAvatars.isNotEmpty) ...[
-              const SizedBox(height: 32),
-              Text(
-                l10n.registrationChooseAvatar,
-                style: TextStyle(
-                  color: cs.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 16),
-              for (final category in widget.presetAvatars)
-                _buildAvatarCategory(cs, category),
-            ],
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _canSubmit ? _submit : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: cs.onSurface,
-                  foregroundColor: cs.surface,
-                  disabledBackgroundColor: cs.onSurface.withValues(alpha: 0.12),
-                  disabledForegroundColor: cs.onSurface.withValues(alpha: 0.38),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 48),
+                        Center(
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.black12,
+                                width: 1,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: _selectedAvatarUrl != null
+                                  ? CachedNetworkImage(
+                                      imageUrl: _selectedAvatarUrl!,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(
+                                      color: Colors.grey.shade100,
+                                      alignment: Alignment.center,
+                                      child: Icon(
+                                        Symbols.person,
+                                        size: 40,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4.0, bottom: 4.0),
+                              child: Text(
+                                l10n.editProfileFirstName.toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                ),
+                              ),
+                              child: TextField(
+                                controller: _firstNameController,
+                                enabled: !_isSubmitting,
+                                textInputAction: TextInputAction.next,
+                                onChanged: (_) => setState(() {}),
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(vertical: 12.0),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4.0, bottom: 4.0),
+                              child: Text(
+                                l10n.editProfileLastName.toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                ),
+                              ),
+                              child: TextField(
+                                controller: _lastNameController,
+                                enabled: !_isSubmitting,
+                                textInputAction: TextInputAction.done,
+                                onChanged: (_) => setState(() {}),
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(vertical: 12.0),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (widget.presetAvatars.isNotEmpty) ...[
+                          const SizedBox(height: 32),
+                          Text(
+                            l10n.registrationChooseAvatar.toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          for (final category in widget.presetAvatars)
+                            _buildAvatarCategory(cs, category),
+                        ],
+                        const Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 24.0, top: 32.0),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: FilledButton(
+                              onPressed: _canSubmit ? _submit : null,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: Colors.black12,
+                                disabledForegroundColor: Colors.black38,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: _isSubmitting
+                                  ? SmallSpinner(size: 20, color: Colors.white)
+                                  : Text(
+                                      l10n.loginDone.toUpperCase(),
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 1.0,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: _isSubmitting
-                    ? SmallSpinner(size: 20, color: cs.surface)
-                    : Text(
-                        l10n.loginDone.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
-    );
-  }
-
-  Widget _buildInputField({required String label, required Widget content}) {
-    final cs = Theme.of(context).colorScheme;
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: double.infinity,
-          height: 54,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            border: Border.all(color: cs.outlineVariant, width: 1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          alignment: Alignment.centerLeft,
-          child: content,
-        ),
-        Positioned(
-          top: -8,
-          left: 12,
-          child: Container(
-            color: cs.surface,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text(
-              label,
-              style: TextStyle(
-                color: cs.onSurfaceVariant,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -283,7 +353,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             child: Text(
               category.name,
               style: TextStyle(
-                color: cs.onSurfaceVariant,
+                color: Colors.black54,
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
               ),
@@ -311,7 +381,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: selected ? cs.primary : cs.outlineVariant,
+                      color: selected ? Colors.black : Colors.black12,
                       width: selected ? 2 : 1,
                     ),
                   ),
@@ -322,9 +392,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         imageUrl: avatar.url,
                         fit: BoxFit.cover,
                         placeholder: (_, __) =>
-                            Container(color: cs.surfaceContainerHigh),
+                            Container(color: Colors.grey.shade100),
                         errorWidget: (_, __, ___) =>
-                            Container(color: cs.surfaceContainerHigh),
+                            Container(color: Colors.grey.shade100),
                       ),
                     ),
                   ),

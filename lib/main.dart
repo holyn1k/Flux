@@ -657,7 +657,7 @@ class KometAppState extends State<KometApp>
     if (mounted) setState(() {});
   }
 
-  ThemeMode _lastAppliedThemeMode = ThemeMode.system;
+  ThemeMode _lastAppliedThemeMode = ThemeMode.light;
 
   void _rescheduleSwitch() {
     _scheduleTimer?.cancel();

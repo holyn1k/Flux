@@ -9,7 +9,7 @@ class AppThemeModeConfig {
 
   static final _setting = PersistedEnum<AppThemeMode>(
     prefKey: prefKey,
-    defaultValue: AppThemeMode.system,
+    defaultValue: AppThemeMode.light,
     encode: (mode) => mode.name,
     decode: _parse,
   );
@@ -21,7 +21,7 @@ class AppThemeModeConfig {
   static Future<void> save(AppThemeMode mode) => _setting.save(mode);
 
   static AppThemeMode _parse(String? val) =>
-      enumFromName(AppThemeMode.values, val, AppThemeMode.system);
+      enumFromName(AppThemeMode.values, val, AppThemeMode.light);
 
   static String label(AppThemeMode mode) {
     switch (mode) {

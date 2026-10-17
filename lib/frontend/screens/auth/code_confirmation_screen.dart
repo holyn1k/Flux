@@ -305,12 +305,11 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
     final hasError = _errorMessage != null;
 
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -325,38 +324,52 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 44),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () => Navigator.pop(context),
-                              icon: Icon(
-                                Symbols.arrow_back,
-                                color: cs.onSurfaceVariant,
-                                weight: 400,
-                              ),
+                        const SizedBox(height: 16),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F5F5),
+                              shape: BoxShape.circle,
                             ),
-                          ],
+                            child: const Icon(
+                              Symbols.arrow_back_ios_new,
+                              size: 20,
+                              color: Colors.black,
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: 74),
+                        const SizedBox(height: 32),
+                        const Center(
+                          child: Icon(
+                            Icons.check_circle_outline, // Business checkmark logo
+                            size: 48,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Center(
+                          child: Text(
+                            'flux',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
                         Center(
                           child: Column(
                             children: [
                               Text(
-                                'flux',
-                                style: TextStyle(
-                                  color: cs.onSurface,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -1.5,
-                                ),
-                              ),
-                              const SizedBox(height: 48),
-                              Text(
                                 widget.phoneNumber,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: cs.onSurface,
+                                style: const TextStyle(
+                                  color: Colors.black,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w500,
                                   letterSpacing: 1.0,
@@ -366,8 +379,8 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                               Text(
                                 l10n.codeConfirmationSmsSent,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: cs.onSurfaceVariant,
+                                style: const TextStyle(
+                                  color: Colors.black54,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -375,7 +388,7 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                             ],
                           ),
                         ),
-                        const SizedBox(height: 48),
+                        const SizedBox(height: 40),
                         AnimatedBuilder(
                           animation: _shakeAnimation,
                           builder: (context, child) => Transform.translate(
@@ -422,11 +435,11 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
 
                                     Color borderColor;
                                     if (hasError) {
-                                      borderColor = cs.error;
+                                      borderColor = Colors.red;
                                     } else if (isFocused || hasValue) {
-                                      borderColor = cs.onSurface;
+                                      borderColor = Colors.black;
                                     } else {
-                                      borderColor = cs.onSurfaceVariant.withValues(alpha: 0.5);
+                                      borderColor = Colors.black38;
                                     }
 
                                     return AnimatedContainer(
@@ -460,7 +473,7 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                                             char + index.toString() + (hasError ? 'e' : ''),
                                           ),
                                           style: TextStyle(
-                                            color: hasError ? cs.error : cs.onSurface,
+                                            color: hasError ? Colors.red : Colors.black,
                                             fontSize: 24,
                                             fontWeight: FontWeight.w400,
                                           ),
@@ -488,8 +501,8 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                                       child: Text(
                                         _errorMessage!,
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: cs.error,
+                                        style: const TextStyle(
+                                          color: Colors.red,
                                           fontSize: 13,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -506,7 +519,7 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                             child: AnimatedDefaultTextStyle(
                               duration: const Duration(milliseconds: 200),
                               style: TextStyle(
-                                color: _timerSeconds > 0 ? cs.onSurfaceVariant : cs.onSurface,
+                                color: _timerSeconds > 0 ? Colors.black54 : Colors.black,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                                 decoration: _timerSeconds > 0 ? TextDecoration.none : TextDecoration.underline,
@@ -525,8 +538,8 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                           child: Text(
                             l10n.codeConfirmation2faWarning,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: cs.error.withValues(alpha: 0.5),
+                            style: const TextStyle(
+                              color: Colors.black54,
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
                               height: 1.35,
@@ -544,23 +557,23 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                                       if (_codeController.text.length == 6) _verifyCode();
                                     },
                               style: FilledButton.styleFrom(
-                                backgroundColor: cs.onSurface,
-                                foregroundColor: cs.surface,
-                                disabledBackgroundColor: cs.onSurface.withValues(alpha: 0.12),
-                                disabledForegroundColor: cs.onSurface.withValues(alpha: 0.38),
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: Colors.black12,
+                                disabledForegroundColor: Colors.black38,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                               child: recovering || _verifying
-                                  ? SmallSpinner(
+                                  ? const SmallSpinner(
                                       size: 20,
-                                      color: cs.surface,
+                                      color: Colors.white,
                                     )
                                   : Text(
                                       l10n.loginDone.toUpperCase(),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         letterSpacing: 1.0,
