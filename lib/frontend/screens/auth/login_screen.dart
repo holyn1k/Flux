@@ -942,13 +942,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const Spacer(),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Expanded(
-                                child: Padding(
+                               Padding(
                                   padding: const EdgeInsets.only(bottom: 24.0),
                                   child: RichText(
+                                    textAlign: TextAlign.center,
                                     text: TextSpan(
                                       style: TextStyle(
                                         color: cs.onSurface,
@@ -981,31 +981,37 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: FloatingActionButton(
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
                                   onPressed: !_isPhoneValid
                                       ? null
                                       : (_isOnline
                                             ? _validateAndSubmit
                                             : _notifyConnecting),
-                                  backgroundColor: _isPhoneValid
-                                      ? cs.primaryContainer
-                                      : cs.surfaceContainerHighest,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _isPhoneValid
+                                        ? cs.primaryContainer
+                                        : cs.surfaceContainerHighest,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
                                   ),
                                   child: _isPhoneValid && !_isOnline
                                       ? SmallSpinner(
                                           size: 24,
                                           color: cs.onPrimaryContainer,
                                         )
-                                      : Icon(
-                                          Symbols.arrow_forward,
-                                          color: _isPhoneValid
-                                              ? cs.onPrimaryContainer
-                                              : cs.onSurfaceVariant,
+                                      : Text(
+                                          l10n.loginAcceptAndContinue,
+                                          style: TextStyle(
+                                            color: _isPhoneValid
+                                                ? cs.onPrimaryContainer
+                                                : cs.onSurfaceVariant,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                 ),
                               ),

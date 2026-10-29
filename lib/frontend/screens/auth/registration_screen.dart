@@ -104,19 +104,33 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _canSubmit ? _submit : null,
-        backgroundColor: _canSubmit
-            ? cs.primaryContainer
-            : cs.surfaceContainerHighest,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        child: _isSubmitting
-            ? SmallSpinner(size: 22, color: cs.onSurfaceVariant)
-            : Icon(
-                Symbols.arrow_forward,
-                color: _canSubmit ? cs.onPrimaryContainer : cs.onSurfaceVariant,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+          child: ElevatedButton(
+            onPressed: _canSubmit ? _submit : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _canSubmit
+                  ? cs.primaryContainer
+                  : cs.surfaceContainerHighest,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
               ),
+              elevation: 0,
+            ),
+            child: _isSubmitting
+                ? SmallSpinner(size: 22, color: cs.onSurfaceVariant)
+                : Text(
+                    l10n.loginAcceptAndContinue,
+                    style: TextStyle(
+                      color: _canSubmit ? cs.onPrimaryContainer : cs.onSurfaceVariant,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+          ),
+        ),
       ),
       body: SafeArea(
         child: ListView(

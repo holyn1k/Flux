@@ -9,11 +9,10 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get loginTitle => 'Войдите в Komet';
+  String get loginTitle => 'Добро пожаловать\nв flux';
 
   @override
-  String get loginSubtitle =>
-      'Проверьте код страны и введите свой\nномер телефона.';
+  String get loginSubtitle => '';
 
   @override
   String get loginCountry => 'Страна';
@@ -25,10 +24,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginOtherSignInMethods => 'Другие способы входа';
 
   @override
-  String get loginTermsIntro => 'Продолжая, вы соглашаетесь с \n';
+  String get loginTermsIntro =>
+      'Ознакомьтесь с нашими Политиками\nконфиденциальности. Нажмите \"Принять\nи продолжить\", чтобы принять\nПользовательское соглашение.';
 
   @override
-  String get loginTermsLink => 'пользовательскими соглашениями';
+  String get loginTermsLink => '';
 
   @override
   String get loginTermsOfUse => 'Условия использования';
@@ -144,7 +144,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get codeConfirmation2faWarning =>
-      'По умолчанию код приходит в МАХ. Если код не приходит по SMS - не заходите в Komet/MAX 30 минут, и попробуйте заново.';
+      'По умолчанию код приходит в МАХ. Если код не приходит по SMS - не заходите в flux/MAX 30 минут, и попробуйте заново.';
 
   @override
   String get proxySettingsTitle => 'Прокси';
@@ -802,7 +802,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get devicesTitle => 'Устройства';
 
   @override
-  String get devicesPromoTitle => 'Устройства в Komet';
+  String get devicesPromoTitle => 'Устройства в flux';
 
   @override
   String get devicesPromoSubtitle => 'Кто имеет доступ к вашему аккаунту?';
@@ -1015,7 +1015,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get callKometDetectedNotification =>
-      'Этот человек использует Komet! :3';
+      'Этот человек использует flux! :3';
 
   @override
   String get callStatusConnecting => 'Соединение...';
@@ -1057,7 +1057,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get callTooltipExpand => 'Развернуть';
 
   @override
-  String get callTooltipKometHub => 'Komet';
+  String get callTooltipKometHub => 'flux';
 
   @override
   String get callInfoTitle => 'О звонке';
@@ -1240,7 +1240,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get callInfoNoDataYet => 'Данные появятся после соединения…';
 
   @override
-  String get hubTitleMenu => 'Komet';
+  String get hubTitleMenu => 'flux';
 
   @override
   String get hubChatPageTitle => 'Анонимный чат';
@@ -2781,7 +2781,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get webPushInstallBody =>
-      'Откройте push.komet.pw в Safari, добавьте на экран «Домой» и запустите появившуюся иконку. Из вкладки браузера уведомления не работают — так устроена iOS.\n\nВ приложении разрешите уведомления, создайте подписку и нажмите «Открыть Комет». Дальше подписка зарегистрируется сама.';
+      'Откройте push.flux.pw в Safari, добавьте на экран «Домой» и запустите появившуюся иконку. Из вкладки браузера уведомления не работают — так устроена iOS.\n\nВ приложении разрешите уведомления, создайте подписку и нажмите «Открыть flux». Дальше подписка зарегистрируется сама.';
 
   @override
   String get webPushLinkedTitle => 'Уведомления подключены';
@@ -2791,7 +2791,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Подписка зарегистрирована на сервере. Не удаляйте иконку с экрана «Домой» — вместе с ней пропадут уведомления.\n\nЕсли пуши перестанут приходить, откройте приложение и свяжите заново: Apple иногда меняет адрес подписки.';
 
   @override
-  String get webPushOpenSite => 'Открыть push.komet.pw';
+  String get webPushOpenSite => 'Открыть push.flux.pw';
 
   @override
   String get webPushSignOut => 'Отключить уведомления';
@@ -2837,4 +2837,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get webPushStatusDevice => 'Устройство';
+
+  @override
+  String get loginAcceptAndContinue => 'Принять и продолжить';
 }

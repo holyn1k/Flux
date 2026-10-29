@@ -101,13 +101,13 @@ abstract class AppLocalizations {
   /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to Komet'**
+  /// **'Welcome to flux'**
   String get loginTitle;
 
   /// No description provided for @loginSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Check your country code and enter your\nphone number.'**
+  /// **''**
   String get loginSubtitle;
 
   /// No description provided for @loginCountry.
@@ -131,13 +131,13 @@ abstract class AppLocalizations {
   /// No description provided for @loginTermsIntro.
   ///
   /// In en, this message translates to:
-  /// **'By continuing, you agree to \n'**
+  /// **'Review our Privacy Policy.\nTap \"Accept and continue\" to accept\nthe User Agreement.'**
   String get loginTermsIntro;
 
   /// No description provided for @loginTermsLink.
   ///
   /// In en, this message translates to:
-  /// **'the terms of use'**
+  /// **''**
   String get loginTermsLink;
 
   /// No description provided for @loginTermsOfUse.
@@ -1997,7 +1997,7 @@ abstract class AppLocalizations {
   /// No description provided for @callKometDetectedNotification.
   ///
   /// In en, this message translates to:
-  /// **'This person uses Komet! :3'**
+  /// **'This person uses flux! :3'**
   String get callKometDetectedNotification;
 
   /// No description provided for @callStatusConnecting.
@@ -2081,7 +2081,7 @@ abstract class AppLocalizations {
   /// No description provided for @callTooltipKometHub.
   ///
   /// In en, this message translates to:
-  /// **'Komet'**
+  /// **'flux'**
   String get callTooltipKometHub;
 
   /// No description provided for @callInfoTitle.
@@ -2429,7 +2429,7 @@ abstract class AppLocalizations {
   /// No description provided for @hubTitleMenu.
   ///
   /// In en, this message translates to:
-  /// **'Komet'**
+  /// **'flux'**
   String get hubTitleMenu;
 
   /// No description provided for @hubChatPageTitle.
@@ -5219,7 +5219,7 @@ abstract class AppLocalizations {
   /// No description provided for @webPushIntro.
   ///
   /// In en, this message translates to:
-  /// **'Komet has no ordinary push on iOS: Apple issues a notification token only to apps signed with a developer certificate, and a sideloaded build never gets one.\n\nThe way around it is a web app on the Home Screen. MAX\'s own server sends the notifications through Apple, and a separate icon displays them.\n\nThat needs a web session. Komet creates one and approves it itself, from this very device — no phone number or code required.'**
+  /// **'flux has no ordinary push on iOS: Apple issues a notification token only to apps signed with a developer certificate, and a sideloaded build never gets one.\n\nThe way around it is a web app on the Home Screen. MAX\'s own server sends the notifications through Apple, and a separate icon displays them.\n\nThat needs a web session. flux creates one and approves it itself, from this very device — no phone number or code required.'**
   String get webPushIntro;
 
   /// No description provided for @webPushConfirm.
@@ -5255,7 +5255,7 @@ abstract class AppLocalizations {
   /// No description provided for @webPushInstallBody.
   ///
   /// In en, this message translates to:
-  /// **'Open push.komet.pw in Safari, add it to the Home Screen and launch the icon that appears. Notifications do not work from a browser tab — that is how iOS works.\n\nIn the app, allow notifications, create a subscription and tap \"Open Komet\". The subscription registers itself from there.'**
+  /// **'Open push.flux.pw in Safari, add it to the Home Screen and launch the icon that appears. Notifications do not work from a browser tab — that is how iOS works.\n\nIn the app, allow notifications, create a subscription and tap \"Open flux\". The subscription registers itself from there.'**
   String get webPushInstallBody;
 
   /// No description provided for @webPushLinkedTitle.
@@ -5273,7 +5273,7 @@ abstract class AppLocalizations {
   /// No description provided for @webPushOpenSite.
   ///
   /// In en, this message translates to:
-  /// **'Open push.komet.pw'**
+  /// **'Open push.flux.pw'**
   String get webPushOpenSite;
 
   /// No description provided for @webPushSignOut.
@@ -5309,7 +5309,7 @@ abstract class AppLocalizations {
   /// No description provided for @webPushWaitingBody.
   ///
   /// In en, this message translates to:
-  /// **'Komet is approving the web session from this device. This usually takes a few seconds.'**
+  /// **'flux is approving the web session from this device. This usually takes a few seconds.'**
   String get webPushWaitingBody;
 
   /// No description provided for @webPushNeedsOnline.
@@ -5353,6 +5353,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Device'**
   String get webPushStatusDevice;
+
+  /// No description provided for @loginAcceptAndContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept and continue'**
+  String get loginAcceptAndContinue;
 }
 
 class _AppLocalizationsDelegate

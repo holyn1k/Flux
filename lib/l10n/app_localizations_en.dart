@@ -9,11 +9,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get loginTitle => 'Sign in to Komet';
+  String get loginTitle => 'Welcome to flux';
 
   @override
-  String get loginSubtitle =>
-      'Check your country code and enter your\nphone number.';
+  String get loginSubtitle => '';
 
   @override
   String get loginCountry => 'Country';
@@ -25,10 +24,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginOtherSignInMethods => 'Other sign-in methods';
 
   @override
-  String get loginTermsIntro => 'By continuing, you agree to \n';
+  String get loginTermsIntro =>
+      'Review our Privacy Policy.\nTap \"Accept and continue\" to accept\nthe User Agreement.';
 
   @override
-  String get loginTermsLink => 'the terms of use';
+  String get loginTermsLink => '';
 
   @override
   String get loginTermsOfUse => 'Terms of use';
@@ -1013,7 +1013,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearancePreviewNotBad => 'Not bad at all!';
 
   @override
-  String get callKometDetectedNotification => 'This person uses Komet! :3';
+  String get callKometDetectedNotification => 'This person uses flux! :3';
 
   @override
   String get callStatusConnecting => 'Connecting';
@@ -1055,7 +1055,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get callTooltipExpand => 'Expand';
 
   @override
-  String get callTooltipKometHub => 'Komet';
+  String get callTooltipKometHub => 'flux';
 
   @override
   String get callInfoTitle => 'About call';
@@ -1238,7 +1238,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get callInfoNoDataYet => 'Data will appear after connecting…';
 
   @override
-  String get hubTitleMenu => 'Komet';
+  String get hubTitleMenu => 'flux';
 
   @override
   String get hubChatPageTitle => 'Anonymous chat';
@@ -2747,7 +2747,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webPushIntro =>
-      'Komet has no ordinary push on iOS: Apple issues a notification token only to apps signed with a developer certificate, and a sideloaded build never gets one.\n\nThe way around it is a web app on the Home Screen. MAX\'s own server sends the notifications through Apple, and a separate icon displays them.\n\nThat needs a web session. Komet creates one and approves it itself, from this very device — no phone number or code required.';
+      'flux has no ordinary push on iOS: Apple issues a notification token only to apps signed with a developer certificate, and a sideloaded build never gets one.\n\nThe way around it is a web app on the Home Screen. MAX\'s own server sends the notifications through Apple, and a separate icon displays them.\n\nThat needs a web session. flux creates one and approves it itself, from this very device — no phone number or code required.';
 
   @override
   String get webPushConfirm => 'Continue';
@@ -2769,7 +2769,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webPushInstallBody =>
-      'Open push.komet.pw in Safari, add it to the Home Screen and launch the icon that appears. Notifications do not work from a browser tab — that is how iOS works.\n\nIn the app, allow notifications, create a subscription and tap \"Open Komet\". The subscription registers itself from there.';
+      'Open push.flux.pw in Safari, add it to the Home Screen and launch the icon that appears. Notifications do not work from a browser tab — that is how iOS works.\n\nIn the app, allow notifications, create a subscription and tap \"Open flux\". The subscription registers itself from there.';
 
   @override
   String get webPushLinkedTitle => 'Notifications connected';
@@ -2779,7 +2779,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'The subscription is registered on the server. Do not delete the Home Screen icon — the notifications go with it.\n\nIf push stops arriving, open the web app and link again: Apple sometimes rotates the subscription address.';
 
   @override
-  String get webPushOpenSite => 'Open push.komet.pw';
+  String get webPushOpenSite => 'Open push.flux.pw';
 
   @override
   String get webPushSignOut => 'Disconnect notifications';
@@ -2801,7 +2801,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webPushWaitingBody =>
-      'Komet is approving the web session from this device. This usually takes a few seconds.';
+      'flux is approving the web session from this device. This usually takes a few seconds.';
 
   @override
   String get webPushNeedsOnline =>
@@ -2825,4 +2825,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webPushStatusDevice => 'Device';
+
+  @override
+  String get loginAcceptAndContinue => 'Accept and continue';
 }
