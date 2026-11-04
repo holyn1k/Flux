@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:komet/backend/modules/contacts.dart';
-import 'package:komet/frontend/screens/contacts/contact_sheet_common.dart';
-import 'package:komet/frontend/widgets/custom_notification.dart';
-import 'package:komet/frontend/widgets/komet_avatar.dart';
-import 'package:komet/l10n/app_localizations.dart';
-import 'package:komet/main.dart';
+import 'package:flux/backend/modules/contacts.dart';
+import 'package:flux/frontend/screens/contacts/contact_sheet_common.dart';
+import 'package:flux/frontend/widgets/custom_notification.dart';
+import 'package:flux/frontend/widgets/flux_avatar.dart';
+import 'package:flux/l10n/app_localizations.dart';
+import 'package:flux/main.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../../core/config/app_shape.dart';
 
@@ -134,17 +134,41 @@ class _EditContactCardState extends State<_EditContactCard> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
         shape: AppShape.dialogBorder,
-        title: Text(l10n.editContactDeleteConfirmTitle),
-        content: Text(l10n.editContactDeleteConfirmBody),
+        title: Text(
+          l10n.editContactDeleteConfirmTitle,
+          style: const TextStyle(
+            color: Color(0xFF1A1A1A),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          l10n.editContactDeleteConfirmBody,
+          style: const TextStyle(
+            color: Color(0xFF757575),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.editContactDeleteCancel),
+            child: Text(
+              l10n.editContactDeleteCancel,
+              style: const TextStyle(
+                color: Color(0xFF757575),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.editContactDelete),
+            child: Text(
+              l10n.editContactDelete,
+              style: const TextStyle(
+                color: Color(0xFFE53935),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -161,19 +185,19 @@ class _EditContactCardState extends State<_EditContactCard> {
       return;
     }
 
-    Navigator.of(
-      context,
-    ).pop(const EditContactResult(EditContactAction.removed));
+    Navigator.of(context).pop(
+      const EditContactResult(EditContactAction.removed),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
     final width = MediaQuery.sizeOf(context).width;
     final avatarName = widget.customFirst.isNotEmpty
         ? widget.customFirst
         : widget.onemeFirst;
+    const borderColor = Color(0xFFE2E5EB);
 
     return Center(
       child: Padding(
@@ -183,18 +207,26 @@ class _EditContactCardState extends State<_EditContactCard> {
           child: Container(
             width: width > 420 ? 380 : double.infinity,
             decoration: BoxDecoration(
-              color: cs.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(22),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: borderColor, width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             clipBehavior: Clip.antiAlias,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Center(
-                    child: KometAvatar(
+                    child: FluxAvatar(
                       name: avatarName,
                       size: 88,
                       imageUrl: widget.avatarUrl.isEmpty
@@ -204,13 +236,11 @@ class _EditContactCardState extends State<_EditContactCard> {
                   ),
                   const SizedBox(height: 20),
                   _inputRow(
-                    cs,
                     controller: _firstCtrl,
                     hint: l10n.editContactFirstName,
                   ),
-                  contactSheetDivider(cs),
+                  _divider(),
                   _inputRow(
-                    cs,
                     controller: _lastCtrl,
                     hint: l10n.editContactLastName,
                   ),
@@ -219,13 +249,13 @@ class _EditContactCardState extends State<_EditContactCard> {
                     curve: Curves.easeOutCubic,
                     child: _dirty
                         ? Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: _saveButton(cs, l10n),
+                            padding: const EdgeInsets.only(top: 16),
+                            child: _saveButton(l10n),
                           )
                         : const SizedBox(width: double.infinity),
                   ),
-                  const SizedBox(height: 4),
-                  _deleteButton(cs, l10n),
+                  const SizedBox(height: 8),
+                  _deleteButton(l10n),
                 ],
               ),
             ),
@@ -235,14 +265,24 @@ class _EditContactCardState extends State<_EditContactCard> {
     );
   }
 
-  Widget _inputRow(
-    ColorScheme cs, {
+  Widget _divider() {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: const Color(0xFFE4E7ED).withValues(alpha: 0.8),
+    );
+  }
+
+  Widget _inputRow({
     required TextEditingController controller,
     required String hint,
   }) {
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
     final hasText = controller.text.isNotEmpty;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Expanded(
@@ -251,13 +291,20 @@ class _EditContactCardState extends State<_EditContactCard> {
               maxLength: 60,
               enabled: !_busy,
               onChanged: (_) => setState(() {}),
-              style: TextStyle(color: cs.onSurface, fontSize: 16),
+              style: const TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: InputDecoration(
                 isCollapsed: true,
                 border: InputBorder.none,
                 counterText: '',
                 hintText: hint,
-                hintStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 16),
+                hintStyle: const TextStyle(
+                  color: subtitleColor,
+                  fontSize: 15,
+                ),
               ),
             ),
           ),
@@ -265,12 +312,12 @@ class _EditContactCardState extends State<_EditContactCard> {
             InkWell(
               onTap: _busy ? null : () => setState(() => controller.clear()),
               borderRadius: BorderRadius.circular(20),
-              child: Padding(
-                padding: const EdgeInsets.all(4),
+              child: const Padding(
+                padding: EdgeInsets.all(4),
                 child: Icon(
                   Symbols.close,
                   size: 18,
-                  color: cs.onSurfaceVariant,
+                  color: subtitleColor,
                 ),
               ),
             ),
@@ -279,54 +326,72 @@ class _EditContactCardState extends State<_EditContactCard> {
     );
   }
 
-  Widget _saveButton(ColorScheme cs, AppLocalizations l10n) {
+  Widget _saveButton(AppLocalizations l10n) {
+    const primaryColor = Color(0xFF2C3E50);
+
     return SizedBox(
       width: double.infinity,
+      height: 48,
       child: FilledButton(
         onPressed: _busy ? null : _save,
         style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          backgroundColor: primaryColor,
+          disabledBackgroundColor: const Color(0xFFE2E5EB),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          elevation: 0,
         ),
         child: _saving
             ? const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               )
             : Text(
                 l10n.editContactSave,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
               ),
       ),
     );
   }
 
-  Widget _deleteButton(ColorScheme cs, AppLocalizations l10n) {
+  Widget _deleteButton(AppLocalizations l10n) {
+    const errorColor = Color(0xFFE53935);
+
     return SizedBox(
       width: double.infinity,
+      height: 44,
       child: TextButton(
         onPressed: _busy ? null : _delete,
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          foregroundColor: cs.error,
+          foregroundColor: errorColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         child: _deleting
-            ? SizedBox(
+            ? const SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: cs.error,
+                  color: errorColor,
                 ),
               )
             : Text(
                 l10n.editContactDelete,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
+                  color: errorColor,
                 ),
               ),
       ),
