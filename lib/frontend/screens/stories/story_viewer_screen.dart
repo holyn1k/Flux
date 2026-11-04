@@ -9,14 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../core/config/app_fonts.dart';
+import '../../../core/config/app_frost.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../main.dart' show storiesModule;
 import '../../../models/story.dart';
-import '../../widgets/komet_avatar.dart';
+import '../../widgets/flux_avatar.dart';
 import '../../widgets/small_spinner.dart';
 import 'story_owner_info.dart';
-import '../../../core/config/app_frost.dart';
-import '../../../core/config/app_fonts.dart';
 
 const Duration _photoDuration = Duration(seconds: 5);
 
@@ -443,17 +443,17 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                     child: _StoryMediaView(media: story.media!, video: _video),
                   )
                 : (loading
-                      ? const SizedBox.expand(key: ValueKey('loading'))
-                      : const Center(
-                          key: ValueKey('empty'),
-                          child: Text(
-                            'Историй нет',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 16,
-                            ),
+                    ? const SizedBox.expand(key: ValueKey('loading'))
+                    : const Center(
+                        key: ValueKey('empty'),
+                        child: Text(
+                          'Историй нет',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
                           ),
-                        )),
+                        ),
+                      )),
           ),
           const _TopScrim(),
           if (loading)
@@ -520,7 +520,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                   width: 1.6,
                 ),
               ),
-              child: KometAvatar(
+              child: FluxAvatar(
                 name: info?.name.isNotEmpty == true ? info!.name : '?',
                 size: 34,
                 imageUrl: info?.avatarUrl,
@@ -541,7 +541,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       fontFamily: displayFontOf(context),
-                      shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
+                      shadows: const [Shadow(color: Colors.black54, blurRadius: 4)],
                     ),
                   ),
                   if (story != null && story.time > 0)
@@ -641,28 +641,28 @@ class _SegmentBar extends StatelessWidget {
           _SegmentState.done => const ColoredBox(color: Colors.white),
           _SegmentState.upcoming => ColoredBox(color: track),
           _SegmentState.active => ValueListenableBuilder<double>(
-            valueListenable: progress,
-            builder: (context, value, _) => Stack(
-              children: [
-                Positioned.fill(child: ColoredBox(color: track)),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: FractionallySizedBox(
-                    widthFactor: value.clamp(0.0, 1.0),
-                    heightFactor: 1.0,
-                    child: const DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(color: Colors.white54, blurRadius: 4),
-                        ],
+              valueListenable: progress,
+              builder: (context, value, _) => Stack(
+                children: [
+                  Positioned.fill(child: ColoredBox(color: track)),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: value.clamp(0.0, 1.0),
+                      heightFactor: 1.0,
+                      child: const DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(color: Colors.white54, blurRadius: 4),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
         },
       ),
     );
@@ -839,7 +839,7 @@ class _OwnerCover extends StatelessWidget {
           builder: (context, info) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              KometAvatar(
+              FluxAvatar(
                 name: info?.name.isNotEmpty == true ? info!.name : '?',
                 size: 92,
                 imageUrl: info?.avatarUrl,
