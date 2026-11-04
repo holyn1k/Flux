@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import '../../../core/config/app_fonts.dart';
+import '../../../core/config/app_frost.dart';
+import '../../../core/config/app_shape.dart';
 import '../../../core/config/debug_test.dart';
 import '../../../core/contacts/device_contacts_service.dart';
 import '../../../core/protocol/opcode_map.dart';
@@ -10,18 +13,14 @@ import '../../../backend/modules/contacts.dart';
 import '../../../backend/modules/messages.dart' show ContactCache;
 import '../../../main.dart';
 import '../../../models/contact_info.dart';
-import '../../widgets/komet_avatar.dart';
 import '../../widgets/connection_status.dart';
+import '../../widgets/flux_avatar.dart';
 import '../../widgets/sheet_helpers.dart';
 import '../../widgets/small_spinner.dart';
-import '../../widgets/spectrum_tint.dart';
 import '../../widgets/springy_tap.dart';
 import '../chats/chat_info_screen.dart';
 import 'nfc_exchange_sheet.dart';
 import 'open_contact_profile.dart';
-import '../../../core/config/app_frost.dart';
-import '../../../core/config/app_fonts.dart';
-import '../../../core/config/app_shape.dart';
 
 enum _SearchMode { phone, id }
 
@@ -32,7 +31,7 @@ class ContactsTab extends StatefulWidget {
   State<ContactsTab> createState() => _ContactsTabState();
 }
 
-class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
+class _ContactsTabState extends State<ContactsTab> {
   List<CachedContact> _contacts = [];
   bool _isLoading = true;
 
@@ -83,12 +82,14 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
   }
 
   Future<void> _openSearchById() async {
-    final cs = Theme.of(context).colorScheme;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: cs.surfaceContainerHigh,
-      shape: kSheetShape,
+      showDragHandle: false,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (_) => const _SearchContactSheet(),
     );
   }
@@ -123,9 +124,12 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
 
   Widget _buildContactItem(
     BuildContext context,
-    ColorScheme cs,
     CachedContact contact,
   ) {
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
+
     final fullName =
         '${contact.firstName}${contact.lastName != null ? ' ${contact.lastName}' : ''}'
             .trim();
@@ -147,21 +151,10 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: cs.primary.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                  ),
-                  child: KometAvatar(
-                    name: nameToDisplay,
-                    imageUrl: contact.baseUrl,
-                    size: 48,
-                  ),
+                FluxAvatar(
+                  name: nameToDisplay,
+                  imageUrl: contact.baseUrl,
+                  size: 48,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -174,8 +167,8 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
                           Flexible(
                             child: Text(
                               nameToDisplay,
-                              style: TextStyle(
-                                color: cs.onSurface,
+                              style: const TextStyle(
+                                color: textColor,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -185,9 +178,9 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
                           ),
                           if (contact.isVerified) ...[
                             const SizedBox(width: 4),
-                            Icon(
+                            const Icon(
                               Symbols.verified,
-                              color: cs.primary,
+                              color: accentColor,
                               size: 16,
                               weight: 600,
                               fill: 1,
@@ -200,8 +193,8 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
                         contact.updateTime > 0
                             ? 'Был(а) недавно'
                             : '+${contact.phone}',
-                        style: TextStyle(
-                          color: cs.onSurfaceVariant,
+                        style: const TextStyle(
+                          color: subtitleColor,
                           fontSize: 14,
                         ),
                         maxLines: 1,
@@ -220,16 +213,18 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const borderColor = Color(0xFFE2E5EB);
 
     return Scaffold(
-      backgroundColor: spectrumSurfaceColor(cs),
+      backgroundColor: Colors.white,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 12),
               child: Row(
                 children: [
                   Expanded(
@@ -240,22 +235,24 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
                         Text(
                           'Контакты',
                           style: TextStyle(
-                            color: cs.onSurface,
-                            fontSize: 24,
+                            color: textColor,
+                            fontSize: 26,
                             fontWeight: FontWeight.w700,
                             fontFamily: displayFontOf(context),
+                            letterSpacing: -0.3,
                           ),
                         ),
+                        const SizedBox(height: 4),
                         const ConnectionStatusLine(),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Symbols.person_add, color: cs.onSurface),
+                    icon: const Icon(Symbols.nfc, color: textColor, size: 24),
                     onPressed: _openNfcExchange,
                   ),
                   IconButton(
-                    icon: Icon(Symbols.search, color: cs.onSurface),
+                    icon: const Icon(Symbols.search, color: textColor, size: 24),
                     onPressed: _openSearchById,
                   ),
                 ],
@@ -265,22 +262,28 @@ class _ContactsTabState extends State<ContactsTab> with SpectrumSurface {
               child: _isLoading
                   ? const Center(child: SmallSpinner(size: 36))
                   : _contacts.isEmpty
-                  ? Center(
+                  ? const Center(
                       child: Text(
                         'Нет контактов',
                         style: TextStyle(
-                          color: cs.onSurfaceVariant,
+                          color: subtitleColor,
                           fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     )
-                  : ListView.builder(
+                  : ListView.separated(
                       physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.only(bottom: 120),
                       itemCount: _contacts.length,
+                      separatorBuilder: (_, __) => Divider(
+                        height: 1,
+                        indent: 84,
+                        color: borderColor.withValues(alpha: 0.6),
+                      ),
                       itemBuilder: (context, index) {
                         final contact = _contacts[index];
-                        return _buildContactItem(context, cs, contact);
+                        return _buildContactItem(context, contact);
                       },
                     ),
             ),
@@ -410,9 +413,9 @@ class _SearchContactSheetState extends State<_SearchContactSheet> {
         }
         return;
       }
-      final raw = Map<String, dynamic>.from(contacts.first as Map);
-      final info = ContactInfo.fromMap(raw);
-      ContactsModule.primeContactCache(raw);
+      final rawMap = Map<String, dynamic>.from(contacts.first as Map);
+      final info = ContactInfo.fromMap(rawMap);
+      ContactsModule.primeContactCache(rawMap);
       if (!mounted) return;
       final navigator = Navigator.of(context);
       final accountId = await TokenStorage.getActiveAccountId();
@@ -452,131 +455,234 @@ class _SearchContactSheetState extends State<_SearchContactSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+    const borderColor = Color(0xFFD6D9E0);
     final viewInsets = MediaQuery.of(context).viewInsets;
-    return Padding(
-      padding: EdgeInsets.only(bottom: viewInsets.bottom),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Найти контакт',
-                      style: TextStyle(
-                        color: cs.onSurface,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: viewInsets.bottom),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Center(
+                  child: SheetGrabber(margin: EdgeInsets.only(bottom: 12)),
+                ),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Найти контакт',
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Symbols.close, color: cs.onSurfaceVariant),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              SegmentedButton<_SearchMode>(
-                segments: const [
-                  ButtonSegment(
-                    value: _SearchMode.phone,
-                    label: Text('Номер'),
-                    icon: Icon(Symbols.call, size: 18),
-                  ),
-                  ButtonSegment(
-                    value: _SearchMode.id,
-                    label: Text('ID'),
-                    icon: Icon(Symbols.tag, size: 18),
-                  ),
-                ],
-                selected: {_mode},
-                onSelectionChanged: (s) => _setMode(s.first),
-                showSelectedIcon: false,
-                style: ButtonStyle(visualDensity: VisualDensity.compact),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _controller,
-                autofocus: true,
-                keyboardType: _mode == _SearchMode.phone
-                    ? TextInputType.phone
-                    : TextInputType.number,
-                enabled: !_loading,
-                onSubmitted: (_) => _submit(),
-                onChanged: (_) {
-                  if (_error != null) setState(() => _error = null);
-                },
-                style: TextStyle(color: cs.onSurface, fontSize: 16),
-                decoration: InputDecoration(
-                  hintText: _mode == _SearchMode.phone
-                      ? 'Введите номер телефона'
-                      : 'Введите ID контакта',
-                  hintStyle: TextStyle(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 16,
-                  ),
-                  prefixIcon: Icon(
-                    _mode == _SearchMode.phone ? Symbols.call : Symbols.tag,
-                    color: cs.onSurfaceVariant,
-                    size: 20,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 14,
-                  ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Symbols.close, color: subtitleColor),
+                    ),
+                  ],
                 ),
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
                   decoration: BoxDecoration(
-                    color: cs.errorContainer.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFFF3F4F7),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE4E7ED), width: 1),
                   ),
+                  padding: const EdgeInsets.all(4),
                   child: Row(
                     children: [
-                      Icon(
-                        Symbols.error_outline,
-                        size: 18,
-                        color: cs.onErrorContainer,
+                      _tabOption(
+                        title: 'Номер',
+                        icon: Symbols.call,
+                        selected: _mode == _SearchMode.phone,
+                        onTap: () => _setMode(_SearchMode.phone),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _error!,
-                          style: TextStyle(
-                            color: cs.onErrorContainer,
-                            fontSize: 13,
-                          ),
-                        ),
+                      _tabOption(
+                        title: 'ID',
+                        icon: Symbols.tag,
+                        selected: _mode == _SearchMode.id,
+                        onTap: () => _setMode(_SearchMode.id),
                       ),
                     ],
                   ),
                 ),
-              ],
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: _loading ? null : _submit,
-                style: FilledButton.styleFrom(
-                  shape: AppShape.buttonBorder,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _controller,
+                  autofocus: true,
+                  keyboardType: _mode == _SearchMode.phone
+                      ? TextInputType.phone
+                      : TextInputType.number,
+                  enabled: !_loading,
+                  onSubmitted: (_) => _submit(),
+                  onChanged: (_) {
+                    if (_error != null) setState(() => _error = null);
+                  },
+                  style: const TextStyle(
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: _mode == _SearchMode.phone
+                        ? 'Введите номер телефона'
+                        : 'Введите ID контакта',
+                    hintStyle: const TextStyle(
+                      color: Color(0xFF9E9E9E),
+                      fontSize: 15,
+                    ),
+                    prefixIcon: Icon(
+                      _mode == _SearchMode.phone ? Symbols.call : Symbols.tag,
+                      color: subtitleColor,
+                      size: 20,
+                    ),
+                    filled: true,
+                    fillColor: const Color(0xFFF7F8FA),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: borderColor, width: 1.2),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: accentColor, width: 1.8),
+                    ),
+                  ),
                 ),
-                child: _loading
-                    ? const SmallSpinner(size: 20)
-                    : const Text('Найти'),
+                if (_error != null) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFEBEE),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFFFCDD2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Symbols.error_outline,
+                          size: 18,
+                          color: Color(0xFFD32F2F),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _error!,
+                            style: const TextStyle(
+                              color: Color(0xFFD32F2F),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 50,
+                  child: FilledButton(
+                    onPressed: _loading ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      disabledBackgroundColor: const Color(0xFFE2E5EB),
+                      shape: AppShape.buttonBorder,
+                      elevation: 0,
+                    ),
+                    child: _loading
+                        ? const SmallSpinner(size: 20, color: Colors.white)
+                        : const Text(
+                            'Найти',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _tabOption({
+    required String title,
+    required IconData icon,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: _loading ? null : onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          decoration: BoxDecoration(
+            color: selected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: selected
+                    ? const Color(0xFF1A1A1A)
+                    : const Color(0xFF6B7280),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  color: selected
+                      ? const Color(0xFF1A1A1A)
+                      : const Color(0xFF6B7280),
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                ),
               ),
             ],
           ),
