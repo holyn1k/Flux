@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:komet/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
+import 'package:flux/l10n/app_localizations.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'password_2fa_screen.dart';
 import 'registration_screen.dart';
@@ -305,46 +305,65 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+    const errorColor = Color(0xFFE53935);
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const boxBgColor = Color(0xFFF7F8FA);
+    const boxBorderColor = Color(0xFFD6D9E0);
+
     final l10n = AppLocalizations.of(context)!;
     final hasError = _errorMessage != null;
 
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Symbols.arrow_back, color: cs.onSurfaceVariant),
+          icon: const Icon(Symbols.arrow_back, color: textColor),
           onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'flux',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
         ),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
-              Text(
-                widget.phoneNumber,
-                style: TextStyle(
-                  color: cs.onSurface,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
               const SizedBox(height: 12),
               Text(
+                widget.phoneNumber,
+                style: const TextStyle(
+                  color: textColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
                 l10n.codeConfirmationSmsSent,
-                style: TextStyle(
-                  color: cs.outline,
+                style: const TextStyle(
+                  color: subtitleColor,
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   height: 1.4,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 28),
               AnimatedBuilder(
                 animation: _shakeAnimation,
                 builder: (context, child) => Transform.translate(
@@ -377,87 +396,83 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                     ),
                     GestureDetector(
                       onTap: _openKeyboard,
-                      child: FittedBox(
-                        child: Row(
-                          children: List.generate(6, (index) {
-                            final isFocused =
-                                _codeController.text.length == index &&
-                                _focusNode.hasFocus;
-                            final hasValue =
-                                _codeController.text.length > index;
-                            final char = hasValue
-                                ? _codeController.text[index]
-                                : '';
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(6, (index) {
+                          final isFocused =
+                              _codeController.text.length == index &&
+                              _focusNode.hasFocus;
+                          final hasValue =
+                              _codeController.text.length > index;
+                          final char = hasValue
+                              ? _codeController.text[index]
+                              : '';
 
-                            Color borderColor;
-                            if (hasError && hasValue) {
-                              borderColor = cs.error;
-                            } else if (isFocused) {
-                              borderColor = cs.primary;
-                            } else if (hasValue) {
-                              borderColor = cs.outlineVariant;
-                            } else {
-                              borderColor = Colors.transparent;
-                            }
+                          Color cellBorder;
+                          Color cellBg;
 
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: 44,
-                              height: 54,
-                              margin: EdgeInsets.only(
-                                right: index == 5 ? 0 : 10,
+                          if (hasError && hasValue) {
+                            cellBorder = errorColor;
+                            cellBg = const Color(0xFFFFEBEE);
+                          } else if (isFocused) {
+                            cellBorder = accentColor;
+                            cellBg = Colors.white;
+                          } else if (hasValue) {
+                            cellBorder = primaryColor;
+                            cellBg = Colors.white;
+                          } else {
+                            cellBorder = boxBorderColor;
+                            cellBg = boxBgColor;
+                          }
+
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            width: 48,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: cellBg,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: cellBorder,
+                                width: (isFocused || (hasError && hasValue)) ? 2.0 : 1.2,
                               ),
-                              decoration: BoxDecoration(
-                                color: hasError && hasValue
-                                    ? cs.error.withValues(alpha: 0.1)
-                                    : cs.surfaceContainerHigh,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: borderColor,
-                                  width: 1.5,
+                            ),
+                            alignment: Alignment.center,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 100),
+                              transitionBuilder: (child, animation) {
+                                return ScaleTransition(
+                                  scale: animation,
+                                  child: FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                char,
+                                key: ValueKey<String>(
+                                  char +
+                                      index.toString() +
+                                      (hasError ? 'err' : ''),
+                                ),
+                                style: TextStyle(
+                                  color: hasError && hasValue
+                                      ? errorColor
+                                      : textColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              alignment: Alignment.center,
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 100),
-                                transitionBuilder:
-                                    (
-                                      Widget child,
-                                      Animation<double> animation,
-                                    ) {
-                                      return ScaleTransition(
-                                        scale: animation,
-                                        child: FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        ),
-                                      );
-                                    },
-                                child: Text(
-                                  char,
-                                  key: ValueKey<String>(
-                                    char +
-                                        index.toString() +
-                                        (hasError ? 'e' : ''),
-                                  ),
-                                  style: TextStyle(
-                                    color: hasError && hasValue
-                                        ? cs.error
-                                        : cs.onSurface,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
+                            ),
+                          );
+                        }),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               AnimatedSize(
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeOutCubic,
@@ -470,9 +485,9 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                           duration: const Duration(milliseconds: 200),
                           child: Text(
                             _errorMessage!,
-                            style: TextStyle(
-                              color: cs.error,
-                              fontSize: 14,
+                            style: const TextStyle(
+                              color: errorColor,
+                              fontSize: 13,
                               fontWeight: FontWeight.w500,
                               height: 1.35,
                             ),
@@ -486,9 +501,11 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 200),
                   style: TextStyle(
-                    color: _timerSeconds > 0 ? cs.outline : cs.tertiary,
+                    color: _timerSeconds > 0 ? subtitleColor : accentColor,
                     fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: _timerSeconds > 0
+                        ? FontWeight.w400
+                        : FontWeight.w600,
                   ),
                   child: Text(
                     _timerSeconds > 0
@@ -505,8 +522,8 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                     child: Text(
                       l10n.codeConfirmation2faWarning,
                       style: TextStyle(
-                        color: cs.error.withValues(alpha: 0.5),
-                        fontSize: 13,
+                        color: subtitleColor.withValues(alpha: 0.8),
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                         height: 1.35,
                       ),
@@ -517,27 +534,29 @@ class _CodeConfirmationScreenState extends State<CodeConfirmationScreen>
                     onPressed: (recovering || _verifying)
                         ? null
                         : () {
-                            if (_codeController.text.length == 6) _verifyCode();
+                            if (_codeController.text.length == 6) {
+                              _verifyCode();
+                            }
                           },
                     backgroundColor: _codeController.text.length == 6
-                        ? cs.primaryContainer
-                        : cs.surfaceContainerHighest,
+                        ? primaryColor
+                        : const Color(0xFFE2E5EB),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: recovering
-                        ? SmallSpinner(size: 24, color: cs.onPrimaryContainer)
+                        ? const SmallSpinner(size: 24, color: Colors.white)
                         : Icon(
                             Symbols.arrow_forward,
                             color: _codeController.text.length == 6
-                                ? cs.onPrimaryContainer
-                                : cs.onSurfaceVariant,
+                                ? Colors.white
+                                : const Color(0xFF9E9E9E),
                           ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
             ],
           ),
         ),
