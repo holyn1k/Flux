@@ -31,8 +31,11 @@ Future<T?> showBlurredCard<T>(
   );
 }
 
-Widget contactSheetDivider(ColorScheme cs) =>
-    Divider(height: 1, thickness: 0.5, color: cs.outlineVariant);
+Widget contactSheetDivider(ColorScheme cs) => const Divider(
+      height: 1,
+      thickness: 1,
+      color: Color(0xFFE4E7ED),
+    );
 
 String contactFlagEmoji(String code) {
   if (code.length != 2) return '🏳️';
