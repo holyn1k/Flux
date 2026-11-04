@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:komet/core/config/countries.dart';
-import 'package:komet/l10n/app_localizations.dart';
+import 'package:flux/core/config/countries.dart';
+import 'package:flux/l10n/app_localizations.dart';
 
 class SelectCountryScreen extends StatefulWidget {
   final CountryName selectedCountry;
@@ -26,7 +26,6 @@ class _CountrySearchEntry {
 }
 
 class _SelectCountryScreenState extends State<SelectCountryScreen> {
-  bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   List<CountryName> _sortedCountries = const [];
   List<CountryName> _filteredCountries = const [];
@@ -88,99 +87,173 @@ class _SelectCountryScreenState extends State<SelectCountryScreen> {
     setState(() => _filteredCountries = _applyFilter(query));
   }
 
+  String _countryFlag(String countryCode) {
+    return countryCode.toUpperCase().runes.map((rune) {
+      return String.fromCharCode(rune + 127397);
+    }).join();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context)!;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+    const borderColor = Color(0xFFD6D9E0);
+
     final lang = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: cs.surface,
-        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: Icon(Symbols.arrow_back, color: cs.onSurface),
+          icon: const Icon(Symbols.arrow_back, color: textColor),
         ),
-        title: _isSearching
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                style: TextStyle(
-                  color: cs.onSurface,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
-                ),
-                decoration: InputDecoration(
-                  hintText: l10n.selectCountrySearchHint,
-                  hintStyle: TextStyle(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  border: InputBorder.none,
-                ),
-                onChanged: _filterCountries,
-              )
-            : Text(
-                l10n.selectCountryTitle,
-                style: TextStyle(
-                  color: cs.onSurface,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = !_isSearching;
-                if (!_isSearching) {
-                  _searchController.clear();
-                  _filteredCountries = _sortedCountries;
-                }
-              });
-            },
-            icon: Icon(
-              _isSearching ? Symbols.close : Symbols.search,
-              color: cs.onSurface,
-            ),
+        title: const Text(
+          'flux',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
           ),
-        ],
+        ),
       ),
-      body: ListView.builder(
-        itemCount: _filteredCountries.length,
-        itemBuilder: (context, index) {
-          final country = _filteredCountries[index];
-          final isSelected = country.code == widget.selectedCountry.code;
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+              child: Text(
+                'ВЫБОР СТРАНЫ',
+                style: const TextStyle(
+                  color: textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                itemCount: _filteredCountries.length,
+                separatorBuilder: (_, __) => Divider(
+                  color: borderColor.withValues(alpha: 0.4),
+                  height: 1,
+                ),
+                itemBuilder: (context, index) {
+                  final country = _filteredCountries[index];
+                  final isSelected = country.code == widget.selectedCountry.code;
 
-          return ListTile(
-            leading: Text(
-              country.phoneCode,
-              style: TextStyle(
-                color: cs.onSurfaceVariant,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
+                  return InkWell(
+                    onTap: () => Navigator.pop(context, country),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            _countryFlag(country.code),
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text(
+                              country.displayName(lang),
+                              style: TextStyle(
+                                color: isSelected ? accentColor : textColor,
+                                fontSize: 16,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            country.phoneCode,
+                            style: TextStyle(
+                              color: isSelected ? accentColor : subtitleColor,
+                              fontSize: 15,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                            ),
+                          ),
+                          if (isSelected) ...[
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Symbols.check,
+                              color: accentColor,
+                              size: 20,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
-            title: Text(
-              country.displayName(lang),
-              style: TextStyle(
-                color: cs.onSurface,
-                fontSize: 16,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: borderColor, width: 1.4),
+                  color: const Color(0xFFF7F8FA),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    const Icon(Symbols.search, color: subtitleColor, size: 22),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: _filterCountries,
+                        style: const TextStyle(
+                          color: textColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: 'ПОИСК ПО СТРАНЕ',
+                          hintStyle: TextStyle(
+                            color: subtitleColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                    if (_searchController.text.isNotEmpty)
+                      GestureDetector(
+                        onTap: () {
+                          _searchController.clear();
+                          _filterCountries('');
+                        },
+                        child: const Icon(
+                          Symbols.close,
+                          color: subtitleColor,
+                          size: 18,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-            trailing: isSelected
-                ? Icon(Symbols.check, color: cs.primary)
-                : null,
-            onTap: () {
-              Navigator.pop(context, country);
-            },
-          );
-        },
+          ],
+        ),
       ),
     );
   }
