@@ -130,7 +130,6 @@ class _CallsTabState extends State<CallsTab> with ReloadOnReconnect {
   ) {
     const textColor = Color(0xFF1A1A1A);
     const subtitleColor = Color(0xFF757575);
-    const accentColor = Color(0xFF1E88E5);
     const errorColor = Color(0xFFE53935);
     const borderColor = Color(0xFFE2E5EB);
 
@@ -438,7 +437,7 @@ class _CallsTabState extends State<CallsTab> with ReloadOnReconnect {
       context,
       title: 'Присоединиться к звонку',
       description: 'Вставьте ссылку-приглашение',
-      hint: 'https://flux.im/joincall/...',
+      hint: 'https://max.ru/joincall/...',
       confirmLabel: 'Присоединиться',
       keyboardType: TextInputType.url,
     );
