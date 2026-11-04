@@ -4,6 +4,7 @@ import '../../../core/config/countries.dart';
 
 class PhoneInputFormatter extends TextInputFormatter {
   final CountryName country;
+
   PhoneInputFormatter(this.country);
 
   @override
