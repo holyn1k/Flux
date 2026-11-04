@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/calls/call_session.dart';
+import '../../../core/config/app_fonts.dart';
 import '../../../core/games/checkers.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../widgets/sheet_helpers.dart';
-import '../../../core/config/app_fonts.dart';
 
-Future<void> showKometHub(
+Future<void> showFluxHub(
   BuildContext context, {
   required CallSession session,
   required ColorScheme scheme,
@@ -17,28 +17,30 @@ Future<void> showKometHub(
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    showDragHandle: true,
-    backgroundColor: scheme.surfaceContainerHigh,
-    shape: kSheetShape,
+    showDragHandle: false,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
     builder: (_) => Theme(
       data: Theme.of(context).copyWith(colorScheme: scheme),
-      child: _KometHub(session: session),
+      child: _FluxHub(session: session),
     ),
   );
 }
 
 enum _HubPage { menu, chat, games, checkers }
 
-class _KometHub extends StatefulWidget {
+class _FluxHub extends StatefulWidget {
   final CallSession session;
 
-  const _KometHub({required this.session});
+  const _FluxHub({required this.session});
 
   @override
-  State<_KometHub> createState() => _KometHubState();
+  State<_FluxHub> createState() => _FluxHubState();
 }
 
-class _KometHubState extends State<_KometHub> {
+class _FluxHubState extends State<_FluxHub> {
   _HubPage _page = _HubPage.menu;
 
   void _go(_HubPage page) => setState(() => _page = page);
@@ -62,7 +64,7 @@ class _KometHubState extends State<_KometHub> {
     final l10n = AppLocalizations.of(context)!;
     switch (_page) {
       case _HubPage.menu:
-        return l10n.hubTitleMenu;
+        return 'Flux Hub';
       case _HubPage.chat:
         return l10n.hubChatPageTitle;
       case _HubPage.games:
@@ -74,30 +76,41 @@ class _KometHubState extends State<_KometHub> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.78,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _header(cs),
-              Flexible(child: _body(cs)),
-            ],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.78,
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 12),
+                const Center(
+                  child: SheetGrabber(margin: EdgeInsets.only(bottom: 8)),
+                ),
+                _header(),
+                Flexible(child: _body()),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _header(ColorScheme cs) {
+  Widget _header() {
+    const textColor = Color(0xFF1A1A1A);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 0, 16, 8),
       child: Row(
@@ -106,17 +119,18 @@ class _KometHubState extends State<_KometHub> {
             onPressed: _back,
             icon: Icon(
               _page == _HubPage.menu ? Symbols.close : Symbols.arrow_back,
-              color: cs.onSurface,
+              color: textColor,
             ),
           ),
           const SizedBox(width: 4),
           Text(
             _title,
             style: TextStyle(
-              color: cs.onSurface,
+              color: textColor,
               fontSize: 18,
               fontWeight: FontWeight.w700,
               fontFamily: displayFontOf(context),
+              letterSpacing: -0.2,
             ),
           ),
         ],
@@ -124,33 +138,31 @@ class _KometHubState extends State<_KometHub> {
     );
   }
 
-  Widget _body(ColorScheme cs) {
+  Widget _body() {
     switch (_page) {
       case _HubPage.menu:
-        return _menu(cs);
+        return _menu();
       case _HubPage.games:
-        return _games(cs);
+        return _games();
       case _HubPage.chat:
-        return _KometChatView(session: widget.session);
+        return _FluxChatView(session: widget.session);
       case _HubPage.checkers:
         return _CheckersView(session: widget.session);
     }
   }
 
-  Widget _menu(ColorScheme cs) {
+  Widget _menu() {
     final l10n = AppLocalizations.of(context)!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _tile(
-          cs,
           Symbols.forum,
           l10n.hubChatTileTitle,
           l10n.hubChatTileSubtitle,
           () => _go(_HubPage.chat),
         ),
         _tile(
-          cs,
           Symbols.stadia_controller,
           l10n.hubGamesTitle,
           l10n.hubGamesTileSubtitle,
@@ -161,20 +173,18 @@ class _KometHubState extends State<_KometHub> {
     );
   }
 
-  Widget _games(ColorScheme cs) {
+  Widget _games() {
     final l10n = AppLocalizations.of(context)!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _tile(
-          cs,
           Symbols.grid_on,
           l10n.hubCheckersTitle,
           l10n.hubCheckersTileSubtitle,
           () => _go(_HubPage.checkers),
         ),
         _tile(
-          cs,
           Symbols.more_horiz,
           l10n.hubMoreSoonTitle,
           l10n.hubMoreSoonSubtitle,
@@ -186,13 +196,16 @@ class _KometHubState extends State<_KometHub> {
   }
 
   Widget _tile(
-    ColorScheme cs,
     IconData icon,
     String title,
     String subtitle,
     VoidCallback? onTap,
   ) {
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
     final enabled = onTap != null;
+
     return ListTile(
       onTap: onTap,
       enabled: enabled,
@@ -200,40 +213,48 @@ class _KometHubState extends State<_KometHub> {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: cs.surfaceContainerHighest,
+          color: enabled ? const Color(0xFFF3F4F7) : const Color(0xFFF8F9FA),
           shape: BoxShape.circle,
+          border: Border.all(color: const Color(0xFFE2E5EB), width: 1),
         ),
-        child: Icon(icon, color: enabled ? cs.primary : cs.onSurfaceVariant),
+        child: Icon(
+          icon,
+          color: enabled ? accentColor : const Color(0xFFBDBDBD),
+          size: 22,
+        ),
       ),
       title: Text(
         title,
         style: TextStyle(
-          color: enabled ? cs.onSurface : cs.onSurfaceVariant,
+          color: enabled ? textColor : const Color(0xFFBDBDBD),
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+        style: TextStyle(
+          color: enabled ? subtitleColor : const Color(0xFFBDBDBD),
+          fontSize: 13,
+        ),
       ),
       trailing: enabled
-          ? Icon(Symbols.chevron_right, color: cs.onSurfaceVariant)
+          ? const Icon(Symbols.chevron_right, color: subtitleColor, size: 20)
           : null,
     );
   }
 }
 
-class _KometChatView extends StatefulWidget {
+class _FluxChatView extends StatefulWidget {
   final CallSession session;
 
-  const _KometChatView({required this.session});
+  const _FluxChatView({required this.session});
 
   @override
-  State<_KometChatView> createState() => _KometChatViewState();
+  State<_FluxChatView> createState() => _FluxChatViewState();
 }
 
-class _KometChatViewState extends State<_KometChatView> {
+class _FluxChatViewState extends State<_FluxChatView> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scroll = ScrollController();
   StreamSubscription<CallChatMessage>? _sub;
@@ -277,54 +298,68 @@ class _KometChatViewState extends State<_KometChatView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
     final messages = widget.session.chatLog;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
-          child: Row(
-            children: [
-              Icon(Symbols.lock, size: 16, color: cs.primary, fill: 1),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  l10n.hubChatPrivacyNote,
-                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F7FA),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFDDE6ED), width: 1),
+            ),
+            child: Row(
+              children: [
+                const Icon(Symbols.lock, size: 16, color: primaryColor, fill: 1),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.hubChatPrivacyNote,
+                    style: const TextStyle(color: subtitleColor, fontSize: 12.5),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         Flexible(
           child: messages.isEmpty
-              ? _empty(cs)
+              ? _empty()
               : ListView.builder(
                   controller: _scroll,
-                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
                   itemCount: messages.length,
-                  itemBuilder: (_, i) => _bubble(cs, messages[i]),
+                  itemBuilder: (_, i) => _bubble(messages[i]),
                 ),
         ),
-        _input(cs),
+        _input(),
       ],
     );
   }
 
-  Widget _empty(ColorScheme cs) {
+  Widget _empty() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Text(
           AppLocalizations.of(context)!.hubChatEmpty,
-          style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+          style: const TextStyle(color: Color(0xFF757575), fontSize: 14),
         ),
       ),
     );
   }
 
-  Widget _bubble(ColorScheme cs, CallChatMessage message) {
+  Widget _bubble(CallChatMessage message) {
+    const primaryColor = Color(0xFF2C3E50);
+    const bubbleBgOther = Color(0xFFF3F4F7);
+    const textColor = Color(0xFF1A1A1A);
+
     return Align(
       alignment: message.mine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -334,24 +369,34 @@ class _KometChatViewState extends State<_KometChatView> {
           maxWidth: MediaQuery.of(context).size.width * 0.72,
         ),
         decoration: BoxDecoration(
-          color: message.mine ? cs.primary : cs.surfaceContainerHighest,
+          color: message.mine ? primaryColor : bubbleBgOther,
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: message.mine
+                ? Colors.transparent
+                : const Color(0xFFE2E5EB),
+            width: 1,
+          ),
         ),
         child: Text(
           message.text,
           style: TextStyle(
-            color: message.mine ? cs.onPrimary : cs.onSurface,
+            color: message.mine ? Colors.white : textColor,
             fontSize: 15,
             height: 1.25,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ),
     );
   }
 
-  Widget _input(ColorScheme cs) {
+  Widget _input() {
+    const primaryColor = Color(0xFF2C3E50);
+    const inputBorderColor = Color(0xFFD6D9E0);
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -362,27 +407,35 @@ class _KometChatViewState extends State<_KometChatView> {
               maxLines: 4,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => _send(),
-              style: TextStyle(color: cs.onSurface, fontSize: 15),
+              style: const TextStyle(color: Color(0xFF1A1A1A), fontSize: 15),
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)!.hubChatInputHint,
-                hintStyle: TextStyle(color: cs.onSurfaceVariant),
+                hintStyle: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 14),
                 filled: true,
-                fillColor: cs.surfaceContainerHighest,
+                fillColor: const Color(0xFFF7F8FA),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 11,
+                  vertical: 12,
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22),
+                  borderSide: const BorderSide(color: inputBorderColor, width: 1.2),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22),
+                  borderSide: const BorderSide(color: Color(0xFF1E88E5), width: 1.6),
                 ),
               ),
             ),
           ),
           const SizedBox(width: 8),
           IconButton.filled(
+            style: IconButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: const CircleBorder(),
+            ),
             onPressed: _send,
-            icon: const Icon(Symbols.send, fill: 1),
+            icon: const Icon(Symbols.send, fill: 1, color: Colors.white, size: 20),
           ),
         ],
       ),
@@ -406,7 +459,7 @@ class _CheckersViewState extends State<_CheckersView> {
   List<List<int>> _legal = const [];
   CheckersSide? _result;
   late final CheckersSide _me;
-  StreamSubscription<Map<String, dynamic>>? _sub;
+  StreamSubscription>? _sub;
 
   @override
   void initState() {
@@ -508,7 +561,10 @@ class _CheckersViewState extends State<_CheckersView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
@@ -519,8 +575,8 @@ class _CheckersViewState extends State<_CheckersView> {
               Expanded(
                 child: Text(
                   _status(),
-                  style: TextStyle(
-                    color: cs.onSurface,
+                  style: const TextStyle(
+                    color: textColor,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -528,19 +584,22 @@ class _CheckersViewState extends State<_CheckersView> {
               ),
               TextButton.icon(
                 onPressed: _reset,
-                icon: const Icon(Symbols.refresh, size: 20),
-                label: Text(l10n.hubCheckersRestart),
+                icon: const Icon(Symbols.refresh, size: 20, color: accentColor),
+                label: Text(
+                  l10n.hubCheckersRestart,
+                  style: const TextStyle(color: accentColor, fontWeight: FontWeight.w600),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          _boardWidget(cs),
+          _boardWidget(),
           const SizedBox(height: 10),
           Text(
             _me == CheckersSide.white
                 ? l10n.hubCheckersYouWhite
                 : l10n.hubCheckersYouBlack,
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+            style: const TextStyle(color: subtitleColor, fontSize: 13),
           ),
         ],
       ),
@@ -556,15 +615,19 @@ class _CheckersViewState extends State<_CheckersView> {
         : l10n.hubCheckersOpponentMove;
   }
 
-  Widget _boardWidget(ColorScheme cs) {
+  Widget _boardWidget() {
     final flip = _me == CheckersSide.black;
     final options = _options();
     final selected = _path.isNotEmpty ? _path.last : -1;
 
     return AspectRatio(
       aspectRatio: 1,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFD6D9E0), width: 1.5),
+        ),
+        clipBehavior: Clip.antiAlias,
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -579,7 +642,6 @@ class _CheckersViewState extends State<_CheckersView> {
             return GestureDetector(
               onTap: dark ? () => _onTap(square) : null,
               child: _cell(
-                cs,
                 dark: dark,
                 piece: _board[square],
                 option: options.contains(square),
@@ -592,16 +654,19 @@ class _CheckersViewState extends State<_CheckersView> {
     );
   }
 
-  Widget _cell(
-    ColorScheme cs, {
+  Widget _cell({
     required bool dark,
     required int piece,
     required bool option,
     required bool selected,
   }) {
-    final base = dark ? cs.surfaceContainerHighest : cs.surfaceContainerLow;
+    const darkCell = Color(0xFFE2E7ED);
+    const lightCell = Color(0xFFFAFBFC);
+    const selectedCell = Color(0xFFBBDEFB);
+
+    final base = dark ? darkCell : lightCell;
     return Container(
-      color: selected ? cs.primary.withValues(alpha: 0.45) : base,
+      color: selected ? selectedCell : base,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -612,37 +677,39 @@ class _CheckersViewState extends State<_CheckersView> {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: cs.primary.withValues(alpha: 0.55),
+                  color: const Color(0xFF1E88E5).withValues(alpha: 0.6),
                 ),
               ),
             ),
-          if (piece != Checkers.empty) _piece(cs, piece, option),
+          if (piece != Checkers.empty) _piece(piece, option),
         ],
       ),
     );
   }
 
-  Widget _piece(ColorScheme cs, int piece, bool option) {
+  Widget _piece(int piece, bool option) {
     final white = Checkers.sideOf(piece) == CheckersSide.white;
     final king = Checkers.isKing(piece);
+    const accentColor = Color(0xFF1E88E5);
+
     return FractionallySizedBox(
       widthFactor: 0.76,
       heightFactor: 0.76,
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: white ? const Color(0xFFEDEDED) : const Color(0xFF262626),
+          color: white ? Colors.white : const Color(0xFF2C3E50),
           border: Border.all(
             color: option
-                ? cs.primary
-                : (white ? const Color(0xFFB8B8B8) : const Color(0xFF050505)),
+                ? accentColor
+                : (white ? const Color(0xFFB0BEC5) : const Color(0xFF1A252F)),
             width: option ? 2.5 : 1.5,
           ),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black38,
-              blurRadius: 3,
-              offset: Offset(0, 1),
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -652,8 +719,8 @@ class _CheckersViewState extends State<_CheckersView> {
                 fill: 1,
                 size: 16,
                 color: white
-                    ? const Color(0xFF8A6D00)
-                    : const Color(0xFFE7C200),
+                    ? const Color(0xFFD4AF37)
+                    : const Color(0xFFFFD54F),
               )
             : null,
       ),
