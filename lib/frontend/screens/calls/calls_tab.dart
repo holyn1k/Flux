@@ -4,23 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../../main.dart' show api, accountModule;
 import '../../../backend/modules/account.dart';
+import '../../../backend/modules/calls.dart';
+import '../../../core/calls/call_controller.dart';
+import '../../../core/config/app_fonts.dart';
 import '../../../core/storage/app_database.dart';
 import '../../../core/utils/format.dart';
-import '../../../core/calls/call_controller.dart';
-import '../../../backend/modules/calls.dart';
-import '../../widgets/komet_avatar.dart';
-import '../../widgets/connection_status.dart';
-import '../../widgets/reload_on_reconnect.dart';
-import '../../widgets/custom_notification.dart';
-import '../../widgets/chat_menu_overlay.dart';
-import '../../widgets/small_spinner.dart';
-import '../../widgets/prompt_dialog.dart';
-import '../../widgets/call_link_handler.dart';
-import '../../widgets/spectrum_tint.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../widgets/call_link_handler.dart';
+import '../../widgets/chat_menu_overlay.dart';
+import '../../widgets/connection_status.dart';
+import '../../widgets/custom_notification.dart';
+import '../../widgets/flux_avatar.dart';
+import '../../widgets/prompt_dialog.dart';
+import '../../widgets/reload_on_reconnect.dart';
+import '../../widgets/small_spinner.dart';
 import 'call_link_sheet.dart';
 import 'call_screen.dart';
-import '../../../core/config/app_fonts.dart';
 
 class CallsTab extends StatefulWidget {
   const CallsTab({super.key});
@@ -29,8 +28,7 @@ class CallsTab extends StatefulWidget {
   State<CallsTab> createState() => _CallsTabState();
 }
 
-class _CallsTabState extends State<CallsTab>
-    with ReloadOnReconnect, SpectrumSurface {
+class _CallsTabState extends State<CallsTab> with ReloadOnReconnect {
   List<CallLogEntry> _calls = [];
   final Set<String> _removing = {};
   bool _isLoading = true;
@@ -128,9 +126,14 @@ class _CallsTabState extends State<CallsTab>
 
   Widget _buildCallItem(
     BuildContext context,
-    ColorScheme cs,
     CallLogEntry call,
   ) {
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
+    const errorColor = Color(0xFFE53935);
+    const borderColor = Color(0xFFE2E5EB);
+
     final bool isMissed = call.status == CallStatus.missed;
 
     String statusText;
@@ -161,7 +164,7 @@ class _CallsTabState extends State<CallsTab>
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {},
+        onTap: () => _callBack(call),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: Row(
@@ -171,19 +174,19 @@ class _CallsTabState extends State<CallsTab>
                 height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: call.isGroup ? cs.primaryContainer : null,
+                  color: call.isGroup ? const Color(0xFFF0F4F8) : null,
                   border: Border.all(
-                    color: cs.primary.withValues(alpha: 0.1),
-                    width: 1,
+                    color: borderColor,
+                    width: 1.2,
                   ),
                 ),
                 child: call.isGroup
-                    ? Icon(
+                    ? const Icon(
                         Symbols.groups,
-                        color: cs.onPrimaryContainer,
+                        color: Color(0xFF2C3E50),
                         size: 26,
                       )
-                    : KometAvatar(
+                    : FluxAvatar(
                         name: call.name,
                         imageUrl: call.avatarUrl,
                         size: 48,
@@ -197,9 +200,9 @@ class _CallsTabState extends State<CallsTab>
                     Text(
                       displayName,
                       style: TextStyle(
-                        color: isMissed ? cs.error : cs.onSurface,
+                        color: isMissed ? errorColor : textColor,
                         fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -207,13 +210,18 @@ class _CallsTabState extends State<CallsTab>
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(statusIcon, size: 14, color: cs.onSurfaceVariant),
-                        const SizedBox(width: 4),
+                        Icon(
+                          statusIcon,
+                          size: 15,
+                          color: isMissed ? errorColor : subtitleColor,
+                        ),
+                        const SizedBox(width: 5),
                         Text(
                           statusText,
                           style: TextStyle(
-                            color: cs.onSurfaceVariant,
-                            fontSize: 14,
+                            color: isMissed ? errorColor : subtitleColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -226,17 +234,18 @@ class _CallsTabState extends State<CallsTab>
               const SizedBox(width: 8),
               Text(
                 _formatDate(call.time),
-                style: TextStyle(
-                  color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+                style: const TextStyle(
+                  color: subtitleColor,
                   fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(width: 4),
               Builder(
                 builder: (btnContext) => IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Symbols.more_vert,
-                    color: cs.onSurfaceVariant,
+                    color: subtitleColor,
                     size: 20,
                     weight: 400,
                   ),
@@ -337,32 +346,38 @@ class _CallsTabState extends State<CallsTab>
     }
   }
 
-  Widget _buildLinkAction(
-    ColorScheme cs, {
+  Widget _buildLinkAction({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
     bool alignEnd = false,
   }) {
+    const primaryColor = Color(0xFF2C3E50);
+    const borderColor = Color(0xFFD6D9E0);
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F8FA),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: borderColor, width: 1.2),
+        ),
         child: Row(
-          mainAxisAlignment: alignEnd
-              ? MainAxisAlignment.end
-              : MainAxisAlignment.start,
+          mainAxisAlignment:
+              alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
-            Icon(icon, color: cs.primary, size: 24),
-            const SizedBox(width: 12),
+            Icon(icon, color: primaryColor, size: 22),
+            const SizedBox(width: 10),
             Flexible(
               child: Text(
                 label,
-                style: TextStyle(
-                  color: cs.primary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                style: const TextStyle(
+                  color: primaryColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -423,7 +438,7 @@ class _CallsTabState extends State<CallsTab>
       context,
       title: 'Присоединиться к звонку',
       description: 'Вставьте ссылку-приглашение',
-      hint: 'https://max.ru/joincall/...',
+      hint: 'https://flux.im/joincall/...',
       confirmLabel: 'Присоединиться',
       keyboardType: TextInputType.url,
     );
@@ -435,8 +450,11 @@ class _CallsTabState extends State<CallsTab>
     }
   }
 
-  Widget _buildTabItem(String label, int index, ColorScheme cs) {
+  Widget _buildTabItem(String label, int index) {
     final isSelected = _selectedTabIndex == index;
+    const primaryColor = Color(0xFF2C3E50);
+    const subtitleColor = Color(0xFF757575);
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -444,21 +462,21 @@ class _CallsTabState extends State<CallsTab>
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? cs.primary : Colors.transparent,
-              width: 2,
-            ),
+          color: isSelected ? const Color(0xFFF3F4F7) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? primaryColor : Colors.transparent,
+            width: 1.2,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? cs.primary : cs.onSurfaceVariant,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+            color: isSelected ? primaryColor : subtitleColor,
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ),
@@ -467,14 +485,16 @@ class _CallsTabState extends State<CallsTab>
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const borderColor = Color(0xFFE2E5EB);
 
     final filteredCalls = _selectedTabIndex == 1
         ? _calls.where((c) => c.status == CallStatus.missed).toList()
         : _calls;
 
     return Scaffold(
-      backgroundColor: spectrumSurfaceColor(cs),
+      backgroundColor: Colors.white,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -488,50 +508,52 @@ class _CallsTabState extends State<CallsTab>
                   Text(
                     'Звонки',
                     style: TextStyle(
-                      color: cs.onSurface,
-                      fontSize: 24,
+                      color: textColor,
+                      fontSize: 26,
                       fontWeight: FontWeight.w700,
                       fontFamily: displayFontOf(context),
+                      letterSpacing: -0.3,
                     ),
                   ),
+                  const SizedBox(height: 4),
                   const ConnectionStatusLine(),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(
                 children: [
                   Expanded(
                     child: _buildLinkAction(
-                      cs,
                       icon: Symbols.link,
                       label: 'Создать звонок',
                       onTap: _createGroupCall,
                     ),
                   ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: _buildLinkAction(
-                      cs,
                       icon: Symbols.group_add,
                       label: 'Присоединиться',
                       onTap: _joinGroupCall,
-                      alignEnd: true,
+                      alignEnd: false,
                     ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
               child: Row(
                 children: [
-                  _buildTabItem('Все', 0, cs),
+                  _buildTabItem('Все', 0),
                   const SizedBox(width: 8),
-                  _buildTabItem('Пропущенные', 1, cs),
+                  _buildTabItem('Пропущенные', 1),
                 ],
               ),
             ),
+            const SizedBox(height: 6),
             Expanded(
               child: _isLoading
                   ? const Center(child: SmallSpinner(size: 36))
@@ -539,23 +561,29 @@ class _CallsTabState extends State<CallsTab>
                   ? Center(
                       child: Text(
                         'Нет звонков',
-                        style: TextStyle(
-                          color: cs.onSurfaceVariant,
+                        style: const TextStyle(
+                          color: subtitleColor,
                           fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     )
-                  : ListView.builder(
+                  : ListView.separated(
                       physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.only(bottom: 120),
                       itemCount: filteredCalls.length,
+                      separatorBuilder: (_, __) => Divider(
+                        height: 1,
+                        indent: 84,
+                        color: borderColor.withValues(alpha: 0.6),
+                      ),
                       itemBuilder: (context, index) {
                         final call = filteredCalls[index];
                         return _RemovableCallEntry(
                           key: ValueKey(call.id),
                           removing: _removing.contains(call.id),
                           onDismissed: () => _onRemovalComplete(call.id),
-                          child: _buildCallItem(context, cs, call),
+                          child: _buildCallItem(context, call),
                         );
                       },
                     ),
