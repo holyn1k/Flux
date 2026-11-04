@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:komet/backend/modules/contacts.dart';
-import 'package:komet/core/config/countries.dart';
-import 'package:komet/frontend/screens/auth/phone_input_formatter.dart';
-import 'package:komet/frontend/screens/auth/select_country_screen.dart';
-import 'package:komet/frontend/screens/contacts/contact_sheet_common.dart';
-import 'package:komet/frontend/screens/contacts/open_contact_profile.dart';
-import 'package:komet/frontend/widgets/custom_notification.dart';
-import 'package:komet/l10n/app_localizations.dart';
-import 'package:komet/main.dart';
 import 'package:material_symbols_icons/symbols.dart';
+
+import 'package:flux/backend/modules/contacts.dart';
+import 'package:flux/core/config/countries.dart';
+import 'package:flux/frontend/screens/auth/phone_input_formatter.dart';
+import 'package:flux/frontend/screens/auth/select_country_screen.dart';
+import 'package:flux/frontend/screens/contacts/contact_sheet_common.dart';
+import 'package:flux/frontend/screens/contacts/open_contact_profile.dart';
+import 'package:flux/frontend/widgets/custom_notification.dart';
+import 'package:flux/l10n/app_localizations.dart';
+import 'package:flux/main.dart';
 
 Future<void> showAddContactSheet(BuildContext context) {
   return showBlurredCard<void>(
@@ -119,8 +119,9 @@ class _AddContactCardState extends State<_AddContactCard> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const borderColor = Color(0xFFE2E5EB);
     final width = MediaQuery.sizeOf(context).width;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -129,16 +130,24 @@ class _AddContactCardState extends State<_AddContactCard> {
           child: Container(
             width: width > 420 ? 380 : double.infinity,
             decoration: BoxDecoration(
-              color: cs.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(22),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: borderColor, width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             clipBehavior: Clip.antiAlias,
             child: AnimatedSize(
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
               child: _notFoundPhone != null
-                  ? _buildNotFound(cs)
-                  : _buildForm(cs),
+                  ? _buildNotFound()
+                  : _buildForm(),
             ),
           ),
         ),
@@ -146,53 +155,65 @@ class _AddContactCardState extends State<_AddContactCard> {
     );
   }
 
-  Widget _buildForm(ColorScheme cs) {
+  Widget _buildForm() {
     final l10n = AppLocalizations.of(context)!;
+    const textColor = Color(0xFF1A1A1A);
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.addContactTitle,
-            style: TextStyle(
-              color: cs.onSurface,
+            style: const TextStyle(
+              color: textColor,
               fontSize: 22,
               fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
             ),
           ),
-          const SizedBox(height: 20),
-          _buildPhoneRow(cs),
-          contactSheetDivider(cs),
+          const SizedBox(height: 18),
+          _buildPhoneRow(),
+          _divider(),
           _buildTextRow(
-            cs,
             controller: _firstCtrl,
             hint: l10n.addContactFirstName,
           ),
-          contactSheetDivider(cs),
+          _divider(),
           _buildTextRow(
-            cs,
             controller: _lastCtrl,
             hint: l10n.addContactLastName,
           ),
-          contactSheetDivider(cs),
-          _buildSaveButton(cs, l10n),
+          const SizedBox(height: 12),
+          _buildSaveButton(l10n),
         ],
       ),
     );
   }
 
-  Widget _buildPhoneRow(ColorScheme cs) {
+  Widget _divider() {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: const Color(0xFFE4E7ED).withValues(alpha: 0.8),
+    );
+  }
+
+  Widget _buildPhoneRow() {
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           InkWell(
             onTap: _loading ? null : _pickCountry,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -203,16 +224,16 @@ class _AddContactCardState extends State<_AddContactCard> {
                   const SizedBox(width: 6),
                   Text(
                     _country.phoneCode,
-                    style: TextStyle(
-                      color: cs.onSurface,
+                    style: const TextStyle(
+                      color: textColor,
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Symbols.keyboard_arrow_down,
-                    size: 20,
-                    color: cs.onSurfaceVariant,
+                    size: 18,
+                    color: subtitleColor,
                   ),
                 ],
               ),
@@ -229,12 +250,19 @@ class _AddContactCardState extends State<_AddContactCard> {
                 PhoneInputFormatter(_country),
               ],
               onChanged: (_) => setState(() {}),
-              style: TextStyle(color: cs.onSurface, fontSize: 16),
+              style: const TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: InputDecoration(
                 isCollapsed: true,
                 border: InputBorder.none,
                 hintText: _country.phoneMask.replaceAll('#', '0'),
-                hintStyle: TextStyle(color: cs.outline, fontSize: 16),
+                hintStyle: const TextStyle(
+                  color: Color(0xFFBDBDBD),
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
@@ -243,13 +271,15 @@ class _AddContactCardState extends State<_AddContactCard> {
     );
   }
 
-  Widget _buildTextRow(
-    ColorScheme cs, {
+  Widget _buildTextRow({
     required TextEditingController controller,
     required String hint,
   }) {
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Expanded(
@@ -257,48 +287,62 @@ class _AddContactCardState extends State<_AddContactCard> {
               controller: controller,
               maxLength: 60,
               onChanged: (_) => setState(() {}),
-              style: TextStyle(color: cs.onSurface, fontSize: 16),
+              style: const TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: InputDecoration(
                 isCollapsed: true,
                 border: InputBorder.none,
                 counterText: '',
                 hintText: hint,
-                hintStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 16),
+                hintStyle: const TextStyle(
+                  color: subtitleColor,
+                  fontSize: 15,
+                ),
               ),
             ),
           ),
           const SizedBox(width: 8),
           Text(
             '${controller.text.characters.length}/60',
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+            style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 12),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSaveButton(ColorScheme cs, AppLocalizations l10n) {
+  Widget _buildSaveButton(AppLocalizations l10n) {
+    const primaryColor = Color(0xFF2C3E50);
+
     return SizedBox(
       width: double.infinity,
-      child: TextButton(
+      height: 48,
+      child: FilledButton(
         onPressed: _canSave ? _save : null,
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          foregroundColor: cs.primary,
-          disabledForegroundColor: cs.onSurfaceVariant.withValues(alpha: 0.5),
+        style: FilledButton.styleFrom(
+          backgroundColor: primaryColor,
+          disabledBackgroundColor: const Color(0xFFE2E5EB),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          elevation: 0,
         ),
         child: _loading
-            ? SizedBox(
+            ? const SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: cs.primary,
+                  color: Colors.white,
                 ),
               )
             : Text(
                 l10n.addContactSave,
-                style: const TextStyle(
+                style: TextStyle(
+                  color: _canSave ? Colors.white : const Color(0xFF9E9E9E),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -307,36 +351,51 @@ class _AddContactCardState extends State<_AddContactCard> {
     );
   }
 
-  Widget _buildNotFound(ColorScheme cs) {
+  Widget _buildNotFound() {
     final l10n = AppLocalizations.of(context)!;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.addContactNotFound(_notFoundPhone ?? ''),
-            style: TextStyle(
-              color: cs.onSurface,
-              fontSize: 21,
+            style: const TextStyle(
+              color: textColor,
+              fontSize: 20,
               fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             l10n.addContactNotFoundSubtitle,
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+            style: const TextStyle(color: subtitleColor, fontSize: 14),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
-            child: FilledButton.tonal(
+            height: 48,
+            child: OutlinedButton(
               onPressed: () => setState(() => _notFoundPhone = null),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFD6D9E0), width: 1.2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-              child: Text(l10n.addContactSearchOther),
+              child: Text(
+                l10n.addContactSearchOther,
+                style: const TextStyle(
+                  color: textColor,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],
