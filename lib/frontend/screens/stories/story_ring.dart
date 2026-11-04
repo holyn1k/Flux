@@ -6,7 +6,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/utils/haptics.dart';
 import '../../../models/story.dart';
-import '../../widgets/komet_avatar.dart';
+import '../../widgets/flux_avatar.dart';
 import 'story_owner_info.dart';
 
 class StoryAvatarRing extends StatelessWidget {
@@ -31,7 +31,11 @@ class StoryAvatarRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const unreadPrimary = Color(0xFF1E88E5);
+    const unreadSecondary = Color(0xFF64B5F6);
+    const readColor = Color(0xFFE2E5EB);
+    const surfaceColor = Colors.white;
+
     final outer = diameter + ringGap * 2;
     final visible = total > 0;
     return SizedBox(
@@ -46,8 +50,12 @@ class StoryAvatarRing extends StatelessWidget {
                 ? SegmentedRingPainter(
                     total: total,
                     read: read,
-                    unreadColors: [cs.primary, cs.tertiary, cs.primary],
-                    readColor: cs.outlineVariant,
+                    unreadColors: const [
+                      unreadPrimary,
+                      unreadSecondary,
+                      unreadPrimary,
+                    ],
+                    readColor: readColor,
                     strokeWidth: strokeWidth,
                   )
                 : null,
@@ -57,7 +65,7 @@ class StoryAvatarRing extends StatelessWidget {
             height: diameter + haloWidth * 2,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: visible ? cs.surface : Colors.transparent,
+              color: visible ? surfaceColor : Colors.transparent,
             ),
           ),
           child,
@@ -103,9 +111,10 @@ class _StoryRingState extends State<StoryRing> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final hasUnread = widget.preview.hasUnread;
     final diameter = widget.avatarRadius * 2;
+    const textColor = Color(0xFF1A1A1A);
+    const textMutedColor = Color(0xFF757575);
 
     return StoryOwnerBuilder(
       owner: widget.preview.owner,
@@ -135,7 +144,7 @@ class _StoryRingState extends State<StoryRing> {
                       diameter: diameter,
                       total: widget.preview.totalCount,
                       read: widget.preview.readCount,
-                      child: KometAvatar(
+                      child: FluxAvatar(
                         name: name == '…' ? '?' : name,
                         size: diameter,
                         imageUrl: info?.avatarUrl,
@@ -147,7 +156,7 @@ class _StoryRingState extends State<StoryRing> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: cs.onSurface,
+                        color: hasUnread ? textColor : textMutedColor,
                         fontSize: 11,
                         fontWeight: hasUnread
                             ? FontWeight.w600
@@ -277,7 +286,13 @@ class _StorySelfTileState extends State<StorySelfTile> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const unreadPrimary = Color(0xFF1E88E5);
+    const unreadSecondary = Color(0xFF64B5F6);
+    const borderColor = Color(0xFFE2E5EB);
+    const surfaceColor = Colors.white;
+    const buttonBgColor = Color(0xFF2C3E50);
+    const textColor = Color(0xFF1A1A1A);
+
     final diameter = widget.avatarRadius * 2;
     final preview = widget.preview;
 
@@ -310,8 +325,12 @@ class _StorySelfTileState extends State<StorySelfTile> {
                           painter: SegmentedRingPainter(
                             total: preview.totalCount,
                             read: preview.readCount,
-                            unreadColors: [cs.primary, cs.tertiary, cs.primary],
-                            readColor: cs.outlineVariant,
+                            unreadColors: const [
+                              unreadPrimary,
+                              unreadSecondary,
+                              unreadPrimary,
+                            ],
+                            readColor: borderColor,
                             strokeWidth: 2.8,
                           ),
                         )
@@ -322,7 +341,7 @@ class _StorySelfTileState extends State<StorySelfTile> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: cs.outlineVariant,
+                              color: borderColor,
                               width: 2,
                             ),
                           ),
@@ -330,12 +349,12 @@ class _StorySelfTileState extends State<StorySelfTile> {
                       Container(
                         width: diameter + 4,
                         height: diameter + 4,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          color: cs.surface,
+                          color: surfaceColor,
                         ),
                       ),
-                      KometAvatar(
+                      FluxAvatar(
                         name: widget.selfInfo?.name.isNotEmpty == true
                             ? widget.selfInfo!.name
                             : '+',
@@ -353,19 +372,20 @@ class _StorySelfTileState extends State<StorySelfTile> {
                           },
                           child: Container(
                             padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: cs.surface,
+                              color: surfaceColor,
                             ),
                             child: Container(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: cs.primary,
+                                color: buttonBgColor,
                               ),
-                              child: Icon(
+                              padding: const EdgeInsets.all(2),
+                              child: const Icon(
                                 Symbols.add,
                                 size: 14,
-                                color: cs.onPrimary,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -375,12 +395,12 @@ class _StorySelfTileState extends State<StorySelfTile> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
+                const Text(
                   'Ваша история',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: cs.onSurface,
+                    color: textColor,
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
@@ -420,7 +440,10 @@ class FoldedStoryStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const primaryRingColor = Color(0xFF1E88E5);
+    const outlineColor = Color(0xFFE2E5EB);
+    const surfaceColor = Colors.white;
+
     final shown = previews.take(maxShown).toList();
     return Opacity(
       opacity: opacity.clamp(0.0, 1.0),
@@ -440,15 +463,15 @@ class FoldedStoryStack extends StatelessWidget {
                     padding: const EdgeInsets.all(_gap),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: cs.surface,
+                      color: surfaceColor,
                       border: Border.all(
                         color: shown[i].hasUnread
-                            ? cs.primary
-                            : cs.outlineVariant,
+                            ? primaryRingColor
+                            : outlineColor,
                         width: _rim,
                       ),
                     ),
-                    child: KometAvatar(
+                    child: FluxAvatar(
                       name: info?.name.isNotEmpty == true ? info!.name : '?',
                       size: avatarSize,
                       imageUrl: info?.avatarUrl,
