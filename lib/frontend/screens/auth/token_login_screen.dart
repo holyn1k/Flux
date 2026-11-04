@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../core/config/app_shape.dart';
 import '../../../core/storage/spoofing_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../main.dart';
@@ -9,7 +10,6 @@ import '../../widgets/adaptive_shell.dart';
 import '../../widgets/custom_notification.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/small_spinner.dart';
-import '../../../core/config/app_shape.dart';
 
 class TokenLoginScreen extends StatefulWidget {
   final int? returnToAccountId;
@@ -116,16 +116,49 @@ class _TokenLoginScreenState extends State<TokenLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const textColor = Color(0xFF1A1A1A);
+    const primaryColor = Color(0xFF2C3E50);
+
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.tokenLoginTitle), centerTitle: true),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Symbols.arrow_back, color: textColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'flux',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
+        ),
+      ),
       body: AbsorbPointer(
         absorbing: _isLoading,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                l10n.tokenLoginTitle,
+                style: const TextStyle(
+                  color: textColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(height: 16),
               _buildNoteCard(l10n),
               const SizedBox(height: 16),
               _buildTokenCard(l10n),
@@ -137,173 +170,228 @@ class _TokenLoginScreenState extends State<TokenLoginScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: FilledButton(
           onPressed: _isLoading ? null : _login,
           style: FilledButton.styleFrom(
+            backgroundColor: primaryColor,
+            disabledBackgroundColor: const Color(0xFFE2E5EB),
             minimumSize: const Size.fromHeight(52),
             shape: AppShape.buttonBorder,
+            elevation: 0,
           ),
           child: _isLoading
-              ? const SmallSpinner(size: 22)
-              : Text(l10n.tokenLoginButton),
+              ? const SmallSpinner(size: 22, color: Colors.white)
+              : Text(
+                  l10n.tokenLoginButton,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
         ),
       ),
     );
   }
 
   Widget _buildNoteCard(AppLocalizations l10n) {
-    final cs = Theme.of(context).colorScheme;
-    return Card(
-      color: cs.secondaryContainer.withValues(alpha: 0.5),
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            Icon(Symbols.warning, size: 20, color: cs.onSecondaryContainer),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                l10n.tokenLoginNote,
-                style: TextStyle(fontSize: 13, color: cs.onSecondaryContainer),
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8E1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFFE082), width: 1.2),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Symbols.warning, size: 20, color: Color(0xFFF57F17)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              l10n.tokenLoginNote,
+              style: const TextStyle(
+                fontSize: 13,
+                color: Color(0xFF5D4037),
+                height: 1.35,
+                fontWeight: FontWeight.w500,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildTokenCard(AppLocalizations l10n) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: TextField(
-          controller: _tokenController,
-          minLines: 1,
-          maxLines: 3,
-          onChanged: (_) => setState(() {}),
-          decoration: _decoration(l10n.tokenLoginTokenLabel, Symbols.key),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E5EB), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _tokenController,
+        minLines: 1,
+        maxLines: 3,
+        style: const TextStyle(
+          color: Color(0xFF1A1A1A),
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
         ),
+        onChanged: (_) => setState(() {}),
+        decoration: _decoration(l10n.tokenLoginTokenLabel, Symbols.key),
       ),
     );
   }
 
   Widget _buildDeviceCard(AppLocalizations l10n) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SectionHeader(
-              l10n.spoofMainSectionTitle,
-              padding: const EdgeInsets.only(bottom: 16, top: 4),
-              fontSize: 20,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E5EB), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(
+            l10n.spoofMainSectionTitle,
+            padding: const EdgeInsets.only(bottom: 16, top: 2),
+            fontSize: 18,
+          ),
+          Text(
+            l10n.spoofDeviceTypeTitle,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF424242),
             ),
-            Text(l10n.spoofDeviceTypeTitle),
-            const SizedBox(height: 8),
-            _chips(
-              const [
-                _Opt('ANDROID', 'Android', Symbols.android),
-                _Opt('IOS', 'iOS', Symbols.phone_iphone),
-              ],
-              _selectedDeviceType,
-              (v) => setState(() => _selectedDeviceType = v),
+          ),
+          const SizedBox(height: 8),
+          _chips(
+            const [
+              _Opt('ANDROID', 'Android', Symbols.android),
+              _Opt('IOS', 'iOS', Symbols.phone_iphone),
+            ],
+            _selectedDeviceType,
+            (v) => setState(() => _selectedDeviceType = v),
+          ),
+          const SizedBox(height: 16),
+          _field(
+            _deviceNameController,
+            l10n.spoofFieldDeviceName,
+            Symbols.smartphone,
+          ),
+          const SizedBox(height: 14),
+          _field(
+            _osVersionController,
+            l10n.spoofFieldOsVersion,
+            Symbols.layers,
+          ),
+          const SizedBox(height: 14),
+          _field(
+            _screenController,
+            l10n.spoofFieldScreen,
+            Symbols.fullscreen,
+          ),
+          const SizedBox(height: 14),
+          _field(
+            _timezoneController,
+            l10n.spoofFieldTimezone,
+            Symbols.public,
+          ),
+          const SizedBox(height: 14),
+          _field(_localeController, l10n.spoofFieldLocale, Symbols.language),
+          const SizedBox(height: 14),
+          _field(
+            _deviceLocaleController,
+            l10n.spoofFieldDeviceLocale,
+            Symbols.translate,
+          ),
+          const SizedBox(height: 24),
+          SectionHeader(
+            l10n.spoofIdentifiersSectionTitle,
+            padding: const EdgeInsets.only(bottom: 16, top: 4),
+            fontSize: 18,
+          ),
+          _field(
+            _deviceIdController,
+            l10n.spoofFieldDeviceId,
+            Symbols.tag,
+            onChanged: true,
+          ),
+          const SizedBox(height: 14),
+          _field(
+            _instanceIdController,
+            l10n.spoofFieldInstanceId,
+            Symbols.fingerprint,
+          ),
+          const SizedBox(height: 14),
+          _field(
+            _clientSessionIdController,
+            l10n.spoofFieldClientSessionId,
+            Symbols.vpn_key,
+            number: true,
+          ),
+          const SizedBox(height: 14),
+          _field(
+            _appVersionController,
+            l10n.spoofFieldAppVersion,
+            Symbols.info,
+          ),
+          const SizedBox(height: 14),
+          _field(
+            _buildNumberController,
+            l10n.spoofFieldBuildNumber,
+            Symbols.numbers,
+            number: true,
+          ),
+          const SizedBox(height: 14),
+          _field(
+            _pushDeviceTypeController,
+            l10n.spoofFieldPushDeviceType,
+            Symbols.notifications,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.spoofFieldArchitecture,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF424242),
             ),
-            const SizedBox(height: 16),
-            _field(
-              _deviceNameController,
-              l10n.spoofFieldDeviceName,
-              Symbols.smartphone,
-            ),
-            const SizedBox(height: 16),
-            _field(
-              _osVersionController,
-              l10n.spoofFieldOsVersion,
-              Symbols.layers,
-            ),
-            const SizedBox(height: 16),
-            _field(
-              _screenController,
-              l10n.spoofFieldScreen,
-              Symbols.fullscreen,
-            ),
-            const SizedBox(height: 16),
-            _field(
-              _timezoneController,
-              l10n.spoofFieldTimezone,
-              Symbols.public,
-            ),
-            const SizedBox(height: 16),
-            _field(_localeController, l10n.spoofFieldLocale, Symbols.language),
-            const SizedBox(height: 16),
-            _field(
-              _deviceLocaleController,
-              l10n.spoofFieldDeviceLocale,
-              Symbols.translate,
-            ),
-            const SizedBox(height: 24),
-            SectionHeader(
-              l10n.spoofIdentifiersSectionTitle,
-              padding: const EdgeInsets.only(bottom: 16, top: 4),
-              fontSize: 20,
-            ),
-            _field(
-              _deviceIdController,
-              l10n.spoofFieldDeviceId,
-              Symbols.tag,
-              onChanged: true,
-            ),
-            const SizedBox(height: 16),
-            _field(
-              _instanceIdController,
-              l10n.spoofFieldInstanceId,
-              Symbols.fingerprint,
-            ),
-            const SizedBox(height: 16),
-            _field(
-              _clientSessionIdController,
-              l10n.spoofFieldClientSessionId,
-              Symbols.vpn_key,
-              number: true,
-            ),
-            const SizedBox(height: 16),
-            _field(
-              _appVersionController,
-              l10n.spoofFieldAppVersion,
-              Symbols.info,
-            ),
-            const SizedBox(height: 16),
-            _field(
-              _buildNumberController,
-              l10n.spoofFieldBuildNumber,
-              Symbols.numbers,
-              number: true,
-            ),
-            const SizedBox(height: 16),
-            _field(
-              _pushDeviceTypeController,
-              l10n.spoofFieldPushDeviceType,
-              Symbols.notifications,
-            ),
-            const SizedBox(height: 16),
-            Text(l10n.spoofFieldArchitecture),
-            const SizedBox(height: 8),
-            _chips(
-              const [
-                _Opt('arm64-v8a', 'arm64-v8a', Symbols.memory),
-                _Opt('armeabi-v7a', 'armeabi-v7a', Symbols.memory),
-                _Opt('arm64', 'arm64', Symbols.memory),
-                _Opt('x86_64', 'x86_64', Symbols.memory),
-                _Opt('x86', 'x86', Symbols.memory),
-              ],
-              _selectedArch,
-              (v) => setState(() => _selectedArch = v),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 8),
+          _chips(
+            const [
+              _Opt('arm64-v8a', 'arm64-v8a', Symbols.memory),
+              _Opt('armeabi-v7a', 'armeabi-v7a', Symbols.memory),
+              _Opt('arm64', 'arm64', Symbols.memory),
+              _Opt('x86_64', 'x86_64', Symbols.memory),
+              _Opt('x86', 'x86', Symbols.memory),
+            ],
+            _selectedArch,
+            (v) => setState(() => _selectedArch = v),
+          ),
+        ],
       ),
     );
   }
@@ -319,6 +407,11 @@ class _TokenLoginScreenState extends State<TokenLoginScreen> {
       controller: controller,
       keyboardType: number ? TextInputType.number : null,
       onChanged: onChanged ? (_) => setState(() {}) : null,
+      style: const TextStyle(
+        color: Color(0xFF1A1A1A),
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+      ),
       decoration: _decoration(label, icon),
     );
   }
@@ -326,10 +419,19 @@ class _TokenLoginScreenState extends State<TokenLoginScreen> {
   InputDecoration _decoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+      labelStyle: const TextStyle(color: Color(0xFF757575), fontSize: 14),
+      prefixIcon: Icon(icon, color: const Color(0xFF616161), size: 20),
       filled: true,
-      fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      fillColor: const Color(0xFFF7F8FA),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFFD6D9E0), width: 1.2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFF1E88E5), width: 1.8),
+      ),
     );
   }
 
@@ -338,24 +440,38 @@ class _TokenLoginScreenState extends State<TokenLoginScreen> {
     String selected,
     ValueChanged<String> onSelected,
   ) {
-    final cs = Theme.of(context).colorScheme;
+    const accentColor = Color(0xFF1E88E5);
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: options.map((opt) {
         final isSelected = opt.value == selected;
         return ChoiceChip(
-          label: Text(opt.label),
-          avatar: isSelected
-              ? Icon(Symbols.check, size: 18, color: cs.onSecondaryContainer)
-              : Icon(opt.icon, size: 18, color: cs.onSurfaceVariant),
+          label: Text(
+            opt.label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : const Color(0xFF424242),
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            ),
+          ),
+          avatar: Icon(
+            isSelected ? Symbols.check : opt.icon,
+            size: 18,
+            color: isSelected ? Colors.white : const Color(0xFF757575),
+          ),
           selected: isSelected,
           showCheckmark: false,
           onSelected: (_) => onSelected(opt.value),
-          backgroundColor: cs.surfaceContainerHighest,
-          selectedColor: cs.secondaryContainer,
+          backgroundColor: const Color(0xFFF3F4F7),
+          selectedColor: const Color(0xFF2C3E50),
           side: BorderSide(
-            color: isSelected ? Colors.transparent : cs.outlineVariant,
+            color: isSelected ? Colors.transparent : const Color(0xFFD6D9E0),
+            width: 1.2,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         );
       }).toList(),
