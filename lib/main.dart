@@ -8,7 +8,7 @@ import 'package:kolibri/kolibri.dart' show initKolibri;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:video_player_media_kit/video_player_media_kit.dart';
-import 'package:komet/l10n/app_localizations.dart';
+import 'package:flux/l10n/app_localizations.dart';
 import 'package:m3e_collection/m3e_collection.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,7 +25,7 @@ import 'core/config/app_amoled.dart';
 import 'core/config/app_show_extra_info.dart';
 import 'core/config/app_spectrum_background.dart';
 import 'core/config/app_bubble_behavior.dart';
-import 'core/config/komet_settings.dart';
+import 'core/config/flux_settings.dart';
 import 'core/config/call_no_mute.dart';
 import 'core/config/debug_test.dart';
 import 'core/config/app_bubble_shape.dart';
@@ -258,8 +258,8 @@ void main(List<String> args) async {
   await DraftStore.instance.load();
   await ArchivedChatsStore.instance.load();
   await ChatEncryptionStore.instance.load();
-  await KometSettings.load();
-  if (KometSettings.ghostMode.value) SelfPresence.markOffline();
+  await FluxSettings.load();
+  if (FluxSettings.ghostMode.value) SelfPresence.markOffline();
   await ContactCache.load();
   final initialFpsOverlay = prefs.getBool('dev_fps_overlay') ?? false;
   final initialVpnBypass = prefs.getBool(VpnBypassService.prefKey) ?? false;
@@ -310,7 +310,7 @@ void main(List<String> args) async {
   await trafficCaptureFuture;
   await debugLogFuture;
   runApp(
-    KometApp(
+    FluxApp(
       initialLocale: initialLocale,
       initialFpsOverlay: initialFpsOverlay,
       initialVpnBypass: initialVpnBypass,
@@ -322,8 +322,8 @@ void main(List<String> args) async {
   );
 }
 
-class KometApp extends StatefulWidget {
-  const KometApp({
+class FluxApp extends StatefulWidget {
+  const FluxApp({
     super.key,
     required this.initialLocale,
     this.initialFpsOverlay = false,
@@ -343,15 +343,15 @@ class KometApp extends StatefulWidget {
   final Color? initialAccentSeed;
   static final navigatorKey = GlobalKey<NavigatorState>();
 
-  static KometAppState? stateOf(BuildContext context) {
-    return context.findAncestorStateOfType<KometAppState>();
+  static FluxAppState? stateOf(BuildContext context) {
+    return context.findAncestorStateOfType<FluxAppState>();
   }
 
   @override
-  State<KometApp> createState() => KometAppState();
+  State<FluxApp> createState() => FluxAppState();
 }
 
-class KometAppState extends State<KometApp>
+class FluxAppState extends State<FluxApp>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   static const _fallbackSeed = Color(0xFFC1C4FF);
 
@@ -470,7 +470,7 @@ class KometAppState extends State<KometApp>
         await accountModule.removeAccount(accountId);
       }
 
-      final navState = KometApp.navigatorKey.currentState;
+      final navState = FluxApp.navigatorKey.currentState;
       if (navState != null) {
         final overlay = navState.overlay;
         if (overlay != null) {
@@ -488,9 +488,9 @@ class KometAppState extends State<KometApp>
     _vpnBypassSub = VpnBypassService.instance.events.listen((r) {
       final msg = r.bound
           ? 'Обход VPN включён — прямое подключение через '
-                '${r.boundInterface ?? r.transport ?? 'сеть без VPN'}'
+              '${r.boundInterface ?? r.transport ?? 'сеть без VPN'}'
           : 'Обход VPN не удался, подключение через туннель'
-                '${r.reason != null ? ' (${r.reason})' : ''}';
+              '${r.reason != null ? ' (${r.reason})' : ''}';
 
       final now = DateTime.now();
       if (msg == _lastVpnNotice &&
@@ -500,7 +500,7 @@ class KometAppState extends State<KometApp>
       _lastVpnNotice = msg;
       _lastVpnNoticeAt = now;
 
-      final overlay = KometApp.navigatorKey.currentState?.overlay;
+      final overlay = FluxApp.navigatorKey.currentState?.overlay;
       if (overlay != null) {
         showCustomNotificationOnOverlay(overlay, msg);
       }
@@ -515,15 +515,15 @@ class KometAppState extends State<KometApp>
       _lastServerError = msg;
       _lastServerErrorAt = now;
 
-      final overlay = KometApp.navigatorKey.currentState?.overlay;
+      final overlay = FluxApp.navigatorKey.currentState?.overlay;
       if (overlay != null) {
         showCustomNotificationOnOverlay(overlay, msg);
       }
     });
 
     _accountNoticeSub = accountModule.noticeStream.listen((notice) {
-      final overlay = KometApp.navigatorKey.currentState?.overlay;
-      final ctx = KometApp.navigatorKey.currentContext;
+      final overlay = FluxApp.navigatorKey.currentState?.overlay;
+      final ctx = FluxApp.navigatorKey.currentContext;
       if (overlay == null || ctx == null || !ctx.mounted) return;
       final l10n = AppLocalizations.of(ctx);
       if (l10n == null) return;
@@ -556,7 +556,7 @@ class KometAppState extends State<KometApp>
   void _presentIncomingCall() {
     final call = _pendingIncoming;
     if (call == null || _incomingRouteActive || !_shellReady) return;
-    final navState = KometApp.navigatorKey.currentState;
+    final navState = FluxApp.navigatorKey.currentState;
     if (navState == null) {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => _presentIncomingCall(),
@@ -707,7 +707,7 @@ class KometAppState extends State<KometApp>
   }
 
   void _runThemeReveal(Offset center, Future<void> Function() apply) {
-    final overlay = KometApp.navigatorKey.currentState?.overlay;
+    final overlay = FluxApp.navigatorKey.currentState?.overlay;
     final ctx = _captureBoundaryKey.currentContext;
     if (overlay == null || ctx == null) {
       apply();
@@ -956,18 +956,14 @@ class KometAppState extends State<KometApp>
 
   ColorScheme _adjustLightScheme(ColorScheme base) {
     return base.copyWith(
-      surface: Color.alphaBlend(
-        base.primary.withValues(alpha: 0.06),
-        const Color(0xFFF5F5FA),
-      ),
-      surfaceContainerHigh: Color.alphaBlend(
-        base.primary.withValues(alpha: 0.08),
-        const Color(0xFFEAEAF2),
-      ),
-      surfaceContainerHighest: Color.alphaBlend(
-        base.primary.withValues(alpha: 0.11),
-        const Color(0xFFDEDEE8),
-      ),
+      surface: Colors.white,
+      surfaceContainerLowest: Colors.white,
+      surfaceContainerLow: const Color(0xFFFAFBFC),
+      surfaceContainer: const Color(0xFFF7F8FA),
+      surfaceContainerHigh: const Color(0xFFF1F3F6),
+      surfaceContainerHighest: const Color(0xFFE8ECF0),
+      outline: const Color(0xFFD6D9E0),
+      outlineVariant: const Color(0xFFE2E5EB),
     );
   }
 
@@ -1007,7 +1003,7 @@ class KometAppState extends State<KometApp>
             _rebuildThemesIfNeeded(lightScheme, darkScheme);
 
             return MaterialApp(
-              title: 'Komet',
+              title: 'Flux',
               debugShowCheckedModeBanner: false,
               locale: _locale,
               themeMode: _effectiveThemeMode,
@@ -1016,7 +1012,7 @@ class KometAppState extends State<KometApp>
               supportedLocales: AppLocalizations.supportedLocales,
               theme: _lightTheme,
               darkTheme: _darkTheme,
-              navigatorKey: KometApp.navigatorKey,
+              navigatorKey: FluxApp.navigatorKey,
               navigatorObservers: [appRouteObserver],
               builder: (context, child) {
                 return ValueListenableBuilder<double>(
@@ -1089,7 +1085,7 @@ class _StartupScreenState extends State<_StartupScreen> {
         context,
         MaterialPageRoute(builder: (_) => const AdaptiveShell()),
       );
-      KometApp.stateOf(context)?.markShellReady();
+      FluxApp.stateOf(context)?.markShellReady();
       return;
     }
 
@@ -1112,7 +1108,7 @@ class _StartupScreenState extends State<_StartupScreen> {
       context,
       MaterialPageRoute(builder: (_) => const AdaptiveShell()),
     );
-    KometApp.stateOf(context)?.markShellReady();
+    FluxApp.stateOf(context)?.markShellReady();
   }
 
   Future<int?> _recoverActiveAccount() async {
@@ -1134,16 +1130,16 @@ class _StartupScreenState extends State<_StartupScreen> {
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
-      KometApp.stateOf(context)?.markShellReady();
+      FluxApp.stateOf(context)?.markShellReady();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Scaffold(
-      backgroundColor: cs.surface,
-      body: Center(child: SmallSpinner(size: 36, color: cs.primary)),
+    const primaryColor = Color(0xFF2C3E50);
+    return const Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(child: SmallSpinner(size: 36, color: primaryColor)),
     );
   }
 }
