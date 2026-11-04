@@ -10,9 +10,9 @@ import '../../../l10n/app_localizations.dart';
 import '../../../main.dart' show digitalIdModule;
 import '../../../models/digital_id.dart';
 import '../../widgets/connection_status.dart';
-import '../../widgets/reload_on_reconnect.dart';
 import '../../widgets/custom_notification.dart';
 import '../../widgets/error_view.dart';
+import '../../widgets/reload_on_reconnect.dart';
 import '../../widgets/small_spinner.dart';
 
 String _documentLabel(AppLocalizations l10n, String type) {
@@ -179,32 +179,44 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.white,
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       floatingActionButton: const ConnectionSpinner(),
       appBar: AppBar(
-        backgroundColor: cs.surface,
+        backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        title: Text(l10n.digitalIdTitle),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        title: Text(
+          l10n.digitalIdTitle,
+          style: const TextStyle(
+            color: textColor,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
+          ),
+        ),
         leading: IconButton(
-          icon: const Icon(Symbols.arrow_back),
+          icon: const Icon(Symbols.arrow_back, color: textColor),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Symbols.refresh),
+            icon: const Icon(Symbols.refresh, color: textColor),
             onPressed: _loading ? null : _load,
           ),
         ],
       ),
-      body: _buildBody(cs),
+      body: _buildBody(),
     );
   }
 
-  Widget _buildBody(ColorScheme cs) {
+  Widget _buildBody() {
     if (_loading) {
       return const Center(child: SmallSpinner(size: 36));
     }
@@ -212,28 +224,34 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
       return ErrorView(message: _error!, onRetry: _load);
     }
     if (_docs == null) {
-      return _buildOnboarding(cs);
+      return _buildOnboarding();
     }
     return ExpressiveRefreshIndicator(
       onRefresh: _load,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          ..._buildProfile(cs, _docs!),
-          if (_cards.isNotEmpty) ..._buildCards(cs),
+          ..._buildProfile(_docs!),
+          if (_cards.isNotEmpty) ..._buildCards(),
           const SizedBox(height: 16),
-          _buildBiometryInfo(cs),
+          _buildBiometryInfo(),
         ],
       ),
     );
   }
 
-  Widget _buildOnboarding(ColorScheme cs) {
+  Widget _buildOnboarding() {
     final l10n = AppLocalizations.of(context)!;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+    const borderColor = Color(0xFFD6D9E0);
+
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
         child: Column(
           children: [
             Expanded(
@@ -242,15 +260,32 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Symbols.badge, size: 72, color: cs.primary),
-                      const SizedBox(height: 20),
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F7FA),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFDDE6ED),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: const Icon(
+                          Symbols.badge,
+                          size: 52,
+                          color: accentColor,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                       Text(
                         l10n.digitalIdNotConfiguredTitle,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: cs.onSurface,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                          letterSpacing: -0.2,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -259,9 +294,10 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
                             ? l10n.digitalIdLinkGosuslugiHint
                             : l10n.digitalIdLinkOrRefreshHint,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
-                          color: cs.onSurfaceVariant,
+                          color: subtitleColor,
+                          height: 1.4,
                         ),
                       ),
                     ],
@@ -272,51 +308,96 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _busy ? null : _loadDocsExplicit,
-                    icon: const Icon(Symbols.sync, size: 18),
-                    label: Text(
-                      l10n.digitalIdLoadDocuments,
-                      textAlign: TextAlign.center,
+                  child: SizedBox(
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: borderColor, width: 1.2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: _busy ? null : _loadDocsExplicit,
+                      icon: const Icon(Symbols.sync, size: 18, color: textColor),
+                      label: Text(
+                        l10n.digitalIdLoadDocuments,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: textColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: FilledButton.icon(
-                    onPressed: _busy ? null : _linkGosuslugi,
-                    icon: _busy
-                        ? const SmallSpinner(size: 18)
-                        : const Icon(Symbols.link, size: 18),
-                    label: Text(
-                      l10n.digitalIdLinkGosuslugiButton,
-                      textAlign: TextAlign.center,
+                  child: SizedBox(
+                    height: 48,
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        disabledBackgroundColor: const Color(0xFFE2E5EB),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: _busy ? null : _linkGosuslugi,
+                      icon: _busy
+                          ? const SmallSpinner(size: 18, color: Colors.white)
+                          : const Icon(Symbols.link, size: 18, color: Colors.white),
+                      label: Text(
+                        l10n.digitalIdLinkGosuslugiButton,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            _buildBiometryInfo(cs),
+            _buildBiometryInfo(),
           ],
         ),
       ),
     );
   }
 
-  List<Widget> _buildProfile(ColorScheme cs, DigitalIdUserDocs docs) {
+  List<Widget> _buildProfile(DigitalIdUserDocs docs) {
     final l10n = AppLocalizations.of(context)!;
     final profile = docs.profile;
+    const primaryColor = Color(0xFF2C3E50);
+    const borderColor = Color(0xFFE2E5EB);
+
     return [
       Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: cs.primaryContainer,
+          color: const Color(0xFFF7F8FA),
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: borderColor, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Icon(Symbols.verified_user, size: 36, color: cs.onPrimaryContainer),
+            const Icon(
+              Symbols.verified_user,
+              size: 36,
+              color: primaryColor,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -326,18 +407,23 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
                     profile.fullName.isEmpty
                         ? l10n.digitalIdGosuslugiProfileFallback
                         : profile.fullName,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: cs.onPrimaryContainer,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A1A1A),
+                      letterSpacing: -0.2,
                     ),
                   ),
                   if (profile.birthDate != null)
-                    Text(
-                      l10n.digitalIdBirthDate(profile.birthDate!),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: cs.onPrimaryContainer.withValues(alpha: 0.8),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        l10n.digitalIdBirthDate(profile.birthDate!),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF757575),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                 ],
@@ -347,7 +433,7 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
         ),
       ),
       const SizedBox(height: 16),
-      _buildInfoSection(cs, l10n.digitalIdPersonalDataTitle, [
+      _buildInfoSection(l10n.digitalIdPersonalDataTitle, [
         if (profile.snils != null) (l10n.digitalIdSnilsLabel, profile.snils!),
         if (profile.inn != null) (l10n.digitalIdInnLabel, profile.inn!),
         if (profile.gender != null)
@@ -361,48 +447,58 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
           ),
       ]),
       if (profile.documents.isNotEmpty) ...[
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Text(
           l10n.digitalIdDocumentsTitle,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: cs.onSurface,
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1A1A1A),
           ),
         ),
-        const SizedBox(height: 8),
-        ...profile.documents.map((doc) => _buildDocumentTile(cs, doc)),
+        const SizedBox(height: 10),
+        ...profile.documents.map(_buildDocumentTile),
       ],
     ];
   }
 
   Widget _buildInfoSection(
-    ColorScheme cs,
     String title,
     List<(String, String)> rows,
   ) {
     if (rows.isEmpty) return const SizedBox.shrink();
+    const borderColor = Color(0xFFE2E5EB);
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF757575),
+              letterSpacing: 0.3,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           ...rows.map(
             (row) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -410,16 +506,21 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
                     width: 130,
                     child: Text(
                       row.$1,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
-                        color: cs.onSurfaceVariant,
+                        color: Color(0xFF757575),
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
                   Expanded(
                     child: Text(
                       row.$2,
-                      style: TextStyle(fontSize: 14, color: cs.onSurface),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF1A1A1A),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -431,23 +532,42 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
     );
   }
 
-  Widget _buildDocumentTile(ColorScheme cs, DigitalIdDocument doc) {
+  Widget _buildDocumentTile(DigitalIdDocument doc) {
     final l10n = AppLocalizations.of(context)!;
     final label = _documentLabel(l10n, doc.type);
     final subtitleParts = <String>[
       if (doc.series != null) l10n.digitalIdDocSeries(doc.series!),
       if (doc.number != null) l10n.digitalIdDocNumber(doc.number!),
     ];
+    const primaryColor = Color(0xFF2C3E50);
+    const borderColor = Color(0xFFE2E5EB);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(Symbols.description, color: cs.primary),
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F7FA),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Symbols.description, color: primaryColor, size: 22),
+          ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -455,16 +575,22 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
               children: [
                 Text(
                   label,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: cs.onSurface,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1A1A1A),
                   ),
                 ),
                 if (subtitleParts.isNotEmpty)
-                  Text(
-                    subtitleParts.join(', '),
-                    style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      subtitleParts.join(', '),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF757575),
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -474,30 +600,49 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
     );
   }
 
-  List<Widget> _buildCards(ColorScheme cs) {
+  List<Widget> _buildCards() {
     final l10n = AppLocalizations.of(context)!;
+    const primaryColor = Color(0xFF2C3E50);
+    const borderColor = Color(0xFFE2E5EB);
+
     return [
-      const SizedBox(height: 16),
+      const SizedBox(height: 20),
       Text(
         l10n.digitalIdPassesTitle,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: cs.onSurface,
+        style: const TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF1A1A1A),
         ),
       ),
-      const SizedBox(height: 8),
+      const SizedBox(height: 10),
       ..._cards.map(
         (card) => Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(14),
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: cs.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(14),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: borderColor, width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             children: [
-              Icon(Symbols.badge, color: cs.primary),
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F7FA),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Symbols.badge, color: primaryColor, size: 22),
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -505,13 +650,20 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
                   children: [
                     Text(
                       card.companyName,
-                      style: TextStyle(fontSize: 15, color: cs.onSurface),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1A1A1A),
+                      ),
                     ),
-                    Text(
-                      l10n.digitalIdCardInn(card.inn),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: cs.onSurfaceVariant,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        l10n.digitalIdCardInn(card.inn),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF757575),
+                        ),
                       ),
                     ),
                   ],
@@ -524,16 +676,17 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
     ];
   }
 
-  Widget _buildBiometryInfo(ColorScheme cs) {
+  Widget _buildBiometryInfo() {
     final biometry = _biometry;
     if (biometry == null) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Icon(
           biometry.hasBiometryToken ? Symbols.check_circle : Symbols.info,
           size: 18,
-          color: cs.onSurfaceVariant,
+          color: const Color(0xFF757575),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -541,7 +694,7 @@ class _DigitalIdScreenState extends State<DigitalIdScreen>
             biometry.hasBiometryToken
                 ? l10n.digitalIdBiometryConfigured
                 : l10n.digitalIdBiometryNotConfigured,
-            style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
+            style: const TextStyle(fontSize: 13, color: Color(0xFF757575)),
           ),
         ),
       ],
