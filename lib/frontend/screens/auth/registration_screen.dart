@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:komet/l10n/app_localizations.dart';
+import 'package:flux/l10n/app_localizations.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../backend/modules/account.dart';
@@ -90,51 +90,65 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+
     final l10n = AppLocalizations.of(context)!;
     final firstName = _firstNameController.text.trim();
 
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Symbols.arrow_back, color: cs.onSurfaceVariant),
+          icon: const Icon(Symbols.arrow_back, color: textColor),
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'flux',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _canSubmit ? _submit : null,
-        backgroundColor: _canSubmit
-            ? cs.primaryContainer
-            : cs.surfaceContainerHighest,
+        backgroundColor: _canSubmit ? primaryColor : const Color(0xFFE2E5EB),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         child: _isSubmitting
-            ? SmallSpinner(size: 22, color: cs.onSurfaceVariant)
+            ? const SmallSpinner(size: 22, color: Colors.white)
             : Icon(
                 Symbols.arrow_forward,
-                color: _canSubmit ? cs.onPrimaryContainer : cs.onSurfaceVariant,
+                color: _canSubmit ? Colors.white : const Color(0xFF9E9E9E),
               ),
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 96),
           children: [
             Text(
               l10n.registrationTitle,
-              style: TextStyle(
-                color: cs.onSurface,
+              style: const TextStyle(
+                color: textColor,
                 fontSize: 26,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.3,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               l10n.registrationSubtitle,
-              style: TextStyle(
-                color: cs.onSurfaceVariant,
+              style: const TextStyle(
+                color: subtitleColor,
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 height: 1.4,
@@ -143,65 +157,73 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             const SizedBox(height: 28),
             Center(
               child: Container(
-                width: 96,
-                height: 96,
+                width: 104,
+                height: 104,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: cs.primary.withValues(alpha: 0.5),
-                    width: 2.5,
+                    color: accentColor.withValues(alpha: 0.6),
+                    width: 3.0,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: ClipOval(
-                  child: _selectedAvatarUrl != null
-                      ? CachedNetworkImage(
-                          imageUrl: _selectedAvatarUrl!,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          color: cs.primaryContainer,
-                          alignment: Alignment.center,
-                          child: Text(
-                            firstName.isNotEmpty
-                                ? firstName[0].toUpperCase()
-                                : '?',
-                            style: TextStyle(
-                              color: cs.onPrimaryContainer,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
+                child: Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: ClipOval(
+                    child: _selectedAvatarUrl != null
+                        ? CachedNetworkImage(
+                            imageUrl: _selectedAvatarUrl!,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            color: const Color(0xFFF0F4F8),
+                            alignment: Alignment.center,
+                            child: Text(
+                              firstName.isNotEmpty
+                                  ? firstName[0].toUpperCase()
+                                  : '?',
+                              style: const TextStyle(
+                                color: primaryColor,
+                                fontSize: 38,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 32),
             _buildTextField(
-              cs,
               label: l10n.editProfileFirstName,
               controller: _firstNameController,
               textInputAction: TextInputAction.next,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             _buildTextField(
-              cs,
               label: l10n.editProfileLastName,
               controller: _lastNameController,
               textInputAction: TextInputAction.done,
             ),
             if (widget.presetAvatars.isNotEmpty) ...[
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
               Text(
                 l10n.registrationChooseAvatar,
-                style: TextStyle(
-                  color: cs.onSurface,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                style: const TextStyle(
+                  color: textColor,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               for (final category in widget.presetAvatars)
-                _buildAvatarCategory(cs, category),
+                _buildAvatarCategory(category),
             ],
           ],
         ),
@@ -209,12 +231,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildTextField(
-    ColorScheme cs, {
+  Widget _buildTextField({
     required String label,
     required TextEditingController controller,
     required TextInputAction textInputAction,
   }) {
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
+    const inputBgColor = Color(0xFFF7F8FA);
+    const inputBorderColor = Color(0xFFD6D9E0);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -222,7 +249,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           padding: const EdgeInsets.only(left: 4, bottom: 6),
           child: Text(
             label,
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+            style: const TextStyle(
+              color: subtitleColor,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         TextField(
@@ -230,17 +261,38 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           enabled: !_isSubmitting,
           textInputAction: textInputAction,
           onChanged: (_) => setState(() {}),
-          style: TextStyle(color: cs.onSurface, fontSize: 15),
+          style: const TextStyle(
+            color: textColor,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: cs.surfaceContainerHigh,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
+            fillColor: inputBgColor,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 14,
+              vertical: 15,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: inputBorderColor,
+                width: 1.2,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: accentColor,
+                width: 1.8,
+              ),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: inputBorderColor,
+                width: 1.2,
+              ),
             ),
           ),
         ),
@@ -248,7 +300,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildAvatarCategory(ColorScheme cs, PresetAvatarCategory category) {
+  Widget _buildAvatarCategory(PresetAvatarCategory category) {
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -258,10 +313,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             padding: const EdgeInsets.only(left: 4, bottom: 10),
             child: Text(
               category.name,
-              style: TextStyle(
-                color: cs.onSurfaceVariant,
+              style: const TextStyle(
+                color: subtitleColor,
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -278,16 +333,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onTap: _isSubmitting
                     ? null
                     : () => setState(() {
-                        _selectedPhotoId = avatar.id;
-                        _selectedAvatarUrl = avatar.url;
-                      }),
+                          _selectedPhotoId = avatar.id;
+                          _selectedAvatarUrl = avatar.url;
+                        }),
                 child: Container(
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: selected ? cs.primary : Colors.transparent,
+                      color: selected ? accentColor : Colors.transparent,
                       width: 2.5,
                     ),
                   ),
@@ -298,9 +353,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         imageUrl: avatar.url,
                         fit: BoxFit.cover,
                         placeholder: (_, __) =>
-                            Container(color: cs.surfaceContainerHigh),
+                            Container(color: const Color(0xFFF0F4F8)),
                         errorWidget: (_, __, ___) =>
-                            Container(color: cs.surfaceContainerHigh),
+                            Container(color: const Color(0xFFF0F4F8)),
                       ),
                     ),
                   ),
