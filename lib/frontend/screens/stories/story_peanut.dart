@@ -140,7 +140,7 @@ class _StoryPeanutState extends State<StoryPeanut> {
         ? widget.stories[_cycleIndex % widget.stories.length]
         : widget.stories[index];
     final provider = storyThumbProvider(story);
-    final fill = ColoredBox(color: Colors.white.withValues(alpha: 0.22));
+    const fill = ColoredBox(color: Color(0xFFF3F4F7));
     final image = provider == null
         ? fill
         : Image(image: provider, fit: BoxFit.cover, gaplessPlayback: true);
