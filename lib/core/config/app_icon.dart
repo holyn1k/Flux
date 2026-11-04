@@ -8,14 +8,14 @@ enum AppIcon {
   defaultIcon(
     'default',
     'Default',
-    'assets/komet_icon.png',
+    'assets/flux_icon.png',
     'MainActivity',
     null,
   ),
   minimal(
     'minimal',
     'Minimal',
-    'assets/meteor_icon.png',
+    'assets/flux_minimal_icon.png',
     'MinimalIcon',
     'MinimalIcon',
   );
@@ -37,7 +37,7 @@ enum AppIcon {
 
 class AppIconConfig {
   static const prefKey = 'app_icon';
-  static const _channel = MethodChannel('ru.komet.app/app_icon');
+  static const _channel = MethodChannel('ru.flux.app/app_icon');
 
   static final ValueNotifier<AppIcon> current = ValueNotifier(
     AppIcon.defaultIcon,
