@@ -13,8 +13,8 @@ import '../../l10n/app_localizations.dart';
 import '../widgets/chat_menu_overlay.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/custom_notification.dart';
-import '../widgets/small_spinner.dart';
 import '../widgets/sheet_helpers.dart';
+import '../widgets/small_spinner.dart';
 
 class DownloadsScreen extends StatefulWidget {
   const DownloadsScreen({super.key});
@@ -116,18 +116,36 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final clear = await showModalBottomSheet<bool>(
       context: context,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-      shape: kSheetShape,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (sheetContext) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: ListTile(
-            leading: Icon(
-              Symbols.delete_sweep,
-              color: Theme.of(sheetContext).colorScheme.error,
-            ),
-            title: Text(l10n.downloadsClearHistory),
-            onTap: () => Navigator.pop(sheetContext, true),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Center(
+                child: SheetGrabber(margin: EdgeInsets.only(bottom: 12)),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Symbols.delete_sweep,
+                  color: Color(0xFFE53935),
+                  size: 24,
+                ),
+                title: Text(
+                  l10n.downloadsClearHistory,
+                  style: const TextStyle(
+                    color: Color(0xFFE53935),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () => Navigator.pop(sheetContext, true),
+              ),
+            ],
           ),
         ),
       ),
@@ -148,29 +166,53 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const borderColor = Color(0xFFE2E5EB);
+    const accentColor = Color(0xFF1E88E5);
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: cs.surface,
+        backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        titleSpacing: 4,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleSpacing: 0,
+        leading: IconButton(
+          icon: const Icon(Symbols.arrow_back, color: textColor, size: 24),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
         title: Text(
           l10n.downloadsTitle,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+          style: const TextStyle(
+            color: textColor,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.3,
+          ),
         ),
         actions: [
           TextButton(
             key: const ValueKey('downloads-settings'),
             onPressed: _settings,
+            style: TextButton.styleFrom(
+              foregroundColor: accentColor,
+              textStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             child: Text(l10n.downloadsSettings),
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: _loading
-          ? Center(child: SmallSpinner(size: 28, color: cs.primary))
+          ? const Center(
+              child: SmallSpinner(size: 28, color: Color(0xFF2C3E50)),
+            )
           : ValueListenableBuilder<List<DownloadRecord>>(
               valueListenable: DownloadHistory.records,
               builder: (context, records, _) {
@@ -184,8 +226,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                   itemCount: records.length,
                   separatorBuilder: (_, _) => Divider(
                     height: 1,
-                    indent: 92,
-                    color: cs.outlineVariant.withValues(alpha: 0.4),
+                    indent: 86,
+                    color: borderColor.withValues(alpha: 0.7),
                   ),
                   itemBuilder: (context, index) {
                     final record = records[index];
@@ -193,8 +235,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                       record: record,
                       onTap: () => _open(record),
                       onSaveAs: () => _saveAs(record),
-                      onGoToMessage:
-                          record.chatId != null &&
+                      onGoToMessage: record.chatId != null &&
                               record.messageId?.isNotEmpty == true
                           ? () => _goToMessage(record)
                           : null,
@@ -214,23 +255,34 @@ class _DownloadsEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Symbols.download,
-              size: 52,
-              color: cs.onSurfaceVariant.withValues(alpha: 0.35),
+            Container(
+              width: 84,
+              height: 84,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF3F4F7),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Symbols.download,
+                size: 40,
+                color: Color(0xFF9E9E9E),
+              ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: TextStyle(color: cs.onSurfaceVariant, fontSize: 15),
+              style: const TextStyle(
+                color: Color(0xFF757575),
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -277,15 +329,17 @@ class _DownloadTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
     final l10n = AppLocalizations.of(context)!;
     final source = record.sourceName.trim().isEmpty
         ? l10n.downloadsUnknownSource
         : record.sourceName.trim();
+
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 10, 16, 10),
+        padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
         child: Row(
           children: [
             _DownloadPreview(record: record),
@@ -299,19 +353,23 @@ class _DownloadTile extends StatelessWidget {
                     _title(l10n),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: cs.onSurface,
-                      fontSize: 17,
-                      height: 1.15,
-                      fontWeight: FontWeight.w700,
+                    style: const TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                      height: 1.2,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 4),
                   Text(
                     '${formatBytes(record.size)} · $source',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+                    style: const TextStyle(
+                      color: subtitleColor,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ],
               ),
@@ -320,7 +378,7 @@ class _DownloadTile extends StatelessWidget {
               builder: (buttonContext) => IconButton(
                 key: ValueKey('download-more-${record.cacheName}'),
                 tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
-                icon: Icon(Symbols.more_vert, color: cs.onSurfaceVariant),
+                icon: const Icon(Symbols.more_vert, color: subtitleColor, size: 20),
                 onPressed: () => _openMenu(buttonContext),
               ),
             ),
@@ -367,42 +425,46 @@ class _DownloadPreviewState extends State<_DownloadPreview> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final preview = widget.record.thumbnailUrl;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: SizedBox(
-        width: 58,
-        height: 58,
-        child: preview != null && preview.isNotEmpty
-            ? CachedNetworkImage(
-                imageUrl: preview,
-                fit: BoxFit.cover,
-                memCacheWidth: 160,
-                errorWidget: (_, _, _) => _fallback(cs),
-              )
-            : FutureBuilder<File?>(
-                future: _file,
-                builder: (context, snapshot) {
-                  final file = snapshot.data;
-                  if (file != null &&
-                      (widget.record.kind == DownloadKind.photo ||
-                          widget.record.kind == DownloadKind.gif)) {
-                    return Image.file(
-                      file,
-                      fit: BoxFit.cover,
-                      cacheWidth: 160,
-                      errorBuilder: (_, _, _) => _fallback(cs),
-                    );
-                  }
-                  return _fallback(cs);
-                },
-              ),
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFE2E5EB),
+          width: 1,
+        ),
       ),
+      clipBehavior: Clip.antiAlias,
+      child: preview != null && preview.isNotEmpty
+          ? CachedNetworkImage(
+              imageUrl: preview,
+              fit: BoxFit.cover,
+              memCacheWidth: 160,
+              errorWidget: (_, _, _) => _fallback(),
+            )
+          : FutureBuilder<File?>(
+              future: _file,
+              builder: (context, snapshot) {
+                final file = snapshot.data;
+                if (file != null &&
+                    (widget.record.kind == DownloadKind.photo ||
+                        widget.record.kind == DownloadKind.gif)) {
+                  return Image.file(
+                    file,
+                    fit: BoxFit.cover,
+                    cacheWidth: 160,
+                    errorBuilder: (_, _, _) => _fallback(),
+                  );
+                }
+                return _fallback();
+              },
+            ),
     );
   }
 
-  Widget _fallback(ColorScheme cs) {
+  Widget _fallback() {
     final extension = p
         .extension(widget.record.name)
         .replaceFirst('.', '')
@@ -419,7 +481,7 @@ class _DownloadPreviewState extends State<_DownloadPreview> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Icon(icon, color: Colors.white, size: 30),
+          Icon(icon, color: Colors.white, size: 28),
           if (extension.isNotEmpty && widget.record.kind == DownloadKind.file)
             Positioned(
               bottom: 4,
