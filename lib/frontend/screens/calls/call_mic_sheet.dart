@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../core/calls/audio_devices.dart';
-import '../../../core/calls/call_session.dart';
-import '../../../core/calls/pulse_audio.dart';
-import '../../../core/config/app_fonts.dart';
-import '../../../core/config/call_no_mute.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../widgets/custom_notification.dart';
-import '../../widgets/sheet_helpers.dart';
+import 'package:flux/core/calls/audio_devices.dart';
+import 'package:flux/core/calls/call_session.dart';
+import 'package:flux/core/calls/pulse_audio.dart';
+import 'package:flux/core/config/app_fonts.dart';
+import 'package:flux/core/config/call_no_mute.dart';
+import 'package:flux/frontend/widgets/custom_notification.dart';
+import 'package:flux/frontend/widgets/sheet_helpers.dart';
+import 'package:flux/l10n/app_localizations.dart';
 
 Future<void> showCallMicrophoneSheet(
   BuildContext context, {
@@ -18,9 +18,8 @@ Future<void> showCallMicrophoneSheet(
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    showDragHandle: true,
-    backgroundColor: scheme.surfaceContainerHigh,
-    shape: kSheetShape,
+    showDragHandle: false,
+    backgroundColor: Colors.transparent,
     builder: (_) => Theme(
       data: Theme.of(context).copyWith(colorScheme: scheme),
       child: _MicrophoneSheet(session: session),
@@ -119,170 +118,89 @@ class _MicrophoneSheetState extends State<_MicrophoneSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
+    const borderColor = Color(0xFFE2E5EB);
+
     final l10n = AppLocalizations.of(context)!;
     final options = _options;
     final inputs = options?.where((o) => !o.isMonitor).toList() ?? const [];
     final monitors = options?.where((o) => o.isMonitor).toList() ?? const [];
 
-    return SafeArea(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7,
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        border: Border(
+          top: BorderSide(color: borderColor, width: 1.2),
+          left: BorderSide(color: borderColor, width: 1.2),
+          right: BorderSide(color: borderColor, width: 1.2),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _header(cs, l10n),
-            if (CallNoMute.enabled) _noMuteHint(cs, l10n),
-            if (options == null)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else
-              Flexible(
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  children: [
-                    _tile(
-                      cs,
-                      id: null,
-                      label: l10n.callMicrophoneSystem,
-                      icon: Symbols.settings_voice,
-                      viaDevice: true,
+      ),
+      child: SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.75,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 12),
+              const Center(
+                child: SheetGrabber(margin: EdgeInsets.only(bottom: 12)),
+              ),
+              _header(l10n),
+              if (CallNoMute.enabled) _noMuteHint(l10n),
+              if (options == null)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 36),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: accentColor,
                     ),
-                    if (options.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
-                        child: Text(
-                          l10n.callMicrophoneEmpty,
-                          style: TextStyle(
-                            color: cs.onSurfaceVariant,
-                            fontSize: 14,
+                  ),
+                )
+              else
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    children: [
+                      _tile(
+                        id: null,
+                        label: l10n.callMicrophoneSystem,
+                        icon: Symbols.settings_voice,
+                        viaDevice: true,
+                      ),
+                      if (options.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                          child: Text(
+                            l10n.callMicrophoneEmpty,
+                            style: const TextStyle(
+                              color: subtitleColor,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
-                      ),
-                    for (final option in inputs)
-                      _tile(
-                        cs,
-                        id: option.id,
-                        label: option.label,
-                        detail: option.detail,
-                        icon: Symbols.mic,
-                        viaDevice: option.isDevice,
-                      ),
-                    if (monitors.isNotEmpty) ...[
-                      _group(cs, l10n.callMicrophoneMonitors),
-                      for (final option in monitors)
+                      for (final option in inputs)
                         _tile(
-                          cs,
                           id: option.id,
                           label: option.label,
                           detail: option.detail,
-                          icon: Symbols.graphic_eq,
+                          icon: Symbols.mic,
                           viaDevice: option.isDevice,
                         ),
-                    ],
-                  ],
-                ),
-              ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _header(ColorScheme cs, AppLocalizations l10n) => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 0, 8, 12),
-    child: Row(
-      children: [
-        Expanded(
-          child: Text(
-            l10n.callMicrophoneTitle,
-            style: TextStyle(
-              color: cs.onSurface,
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              fontFamily: displayFontOf(context),
-            ),
-          ),
-        ),
-        IconButton(
-          onPressed: () {
-            setState(() => _options = null);
-            _load();
-          },
-          tooltip: l10n.callMicrophoneRefresh,
-          icon: Icon(Symbols.refresh, color: cs.onSurfaceVariant),
-        ),
-      ],
-    ),
-  );
-
-  Widget _noMuteHint(ColorScheme cs, AppLocalizations l10n) => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-    child: Row(
-      children: [
-        Icon(Symbols.graphic_eq, size: 18, color: cs.primary),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            l10n.callNoMuteHint,
-            style: TextStyle(color: cs.primary, fontSize: 13),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _group(ColorScheme cs, String title) => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 12, 20, 6),
-    child: Text(
-      title,
-      style: TextStyle(
-        color: cs.onSurfaceVariant,
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-  );
-
-  Widget _tile(
-    ColorScheme cs, {
-    required String? id,
-    required String label,
-    required IconData icon,
-    String? detail,
-    bool viaDevice = false,
-  }) {
-    final selected = _selected == id;
-    return ListTile(
-      leading: Icon(icon, color: selected ? cs.primary : cs.onSurface),
-      title: Text(
-        label,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          color: selected ? cs.primary : cs.onSurface,
-          fontSize: 16,
-          fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-        ),
-      ),
-      subtitle: detail == null
-          ? null
-          : Text(
-              detail,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12),
-            ),
-      trailing: selected ? Icon(Symbols.check, color: cs.primary) : null,
-      enabled: !_switching,
-      onTap: () => _select(id, viaDevice: viaDevice),
-    );
-  }
-}
+                      if (monitors.isNotEmpty) ...[
+                        _group(l10n.callMicrophoneMonitors),
+                        for (final option in monitors)
+                          _tile(
+                            id: option.id,
+                            label: option.label,
+                            detail: option.detail,
+                            icon: Symbols.graphic_eq,
+                            viaDevice: option.isDevice,
+                          ),
