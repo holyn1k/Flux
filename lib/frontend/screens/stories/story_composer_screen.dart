@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../core/config/app_frost.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../main.dart' show fileUploader, messagesModule, storiesModule;
 import '../../widgets/custom_notification.dart';
 import '../../widgets/primary_loading_button.dart';
-import '../../../core/config/app_frost.dart';
 
 const int _storyExpiration = 86400000;
 
@@ -193,6 +193,8 @@ class _StoryComposerScreenState extends State<StoryComposerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color(0xFF2C3E50);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -218,10 +220,20 @@ class _StoryComposerScreenState extends State<StoryComposerScreen> {
             child: Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const EdgeInsets.all(6),
-                child: IconButton(
-                  icon: const Icon(Symbols.close, color: Colors.white),
-                  onPressed: () => Navigator.of(context).maybePop(),
+                padding: const EdgeInsets.all(12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Symbols.close, color: Colors.white, size: 22),
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
                 ),
               ),
             ),
@@ -229,7 +241,7 @@ class _StoryComposerScreenState extends State<StoryComposerScreen> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 16),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
@@ -252,7 +264,9 @@ class _StoryComposerScreenState extends State<StoryComposerScreen> {
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
+                      height: 52,
                       child: PrimaryLoadingButton(
+                        color: primaryColor,
                         loading: _publishing,
                         onPressed: _publish,
                         child: const Text(
@@ -260,6 +274,7 @@ class _StoryComposerScreenState extends State<StoryComposerScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -286,32 +301,31 @@ class _AudienceToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
+        color: Colors.black.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _segment(context, 1, Symbols.public, 'Все'),
-          _segment(context, 2, Symbols.group, 'Контакты'),
+          _segment(1, Symbols.public, 'Все'),
+          _segment(2, Symbols.group, 'Контакты'),
         ],
       ),
     );
   }
 
-  Widget _segment(BuildContext context, int v, IconData icon, String label) {
+  Widget _segment(int v, IconData icon, String label) {
     final selected = value == v;
-    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => onChanged(v),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? cs.primary : Colors.transparent,
+          color: selected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(26),
         ),
         child: Row(
@@ -320,13 +334,13 @@ class _AudienceToggle extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: selected ? cs.onPrimary : Colors.white70,
+              color: selected ? const Color(0xFF1A1A1A) : Colors.white70,
             ),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: selected ? cs.onPrimary : Colors.white70,
+                color: selected ? const Color(0xFF1A1A1A) : Colors.white70,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
