@@ -3,13 +3,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:komet/core/config/countries.dart';
-import 'package:komet/l10n/app_localizations.dart';
-import 'package:komet/l10n/terms_of_service.dart';
+import 'package:flux/core/config/countries.dart';
+import 'package:flux/l10n/app_localizations.dart';
+import 'package:flux/l10n/terms_of_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'code_confirmation_screen.dart';
 import 'token_login_screen.dart';
-import 'select_country_screen.dart';
 import 'phone_input_formatter.dart';
 import 'proxy_settings_sheet.dart';
 import 'server_settings_sheet.dart';
@@ -37,15 +36,19 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _countrySearchController = TextEditingController();
+
   late CountryName _selectedCountry;
   bool _isPhoneValid = false;
   bool _isTOSRead = false;
+  bool _hasAcceptedWelcome = false;
   String? _phoneError;
   Timer? _phoneErrorTimer;
   int _logoTapCount = 0;
   Timer? _logoTapTimer;
   late SessionState _sessionState;
   StreamSubscription<SessionState>? _stateSub;
+  String _countrySearchQuery = '';
 
   bool get _isOnline => _sessionState == SessionState.online;
 
@@ -59,12 +62,18 @@ class _LoginScreenState extends State<LoginScreen> {
     _stateSub = api.stateStream.listen((state) {
       if (mounted) setState(() => _sessionState = state);
     });
+
     _selectedCountry = countriesByCode['RU'] ?? allCountries.first;
     _clampCountryToAllowed();
     _checkTOS();
   }
 
   Future<void> _onBackPressed() async {
+    if (_hasAcceptedWelcome) {
+      setState(() => _hasAcceptedWelcome = false);
+      return;
+    }
+
     final returnId = widget.returnToAccountId;
     if (returnId != null) {
       await resetDigitalIdSession();
@@ -100,6 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _phoneErrorTimer?.cancel();
     _logoTapTimer?.cancel();
     _phoneController.dispose();
+    _countrySearchController.dispose();
     super.dispose();
   }
 
@@ -108,6 +118,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       setState(() {
         _isTOSRead = prefs.getBool('IsReadeTOS') ?? false;
+        if (_isTOSRead) {
+          _hasAcceptedWelcome = true;
+        }
       });
     }
   }
@@ -134,25 +147,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       setState(() {
         _isTOSRead = true;
-      });
-    }
-  }
-
-  void _showCountryPicker() async {
-    final result = await Navigator.push<CountryName>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SelectCountryScreen(
-          selectedCountry: _selectedCountry,
-          countries: api.registrationCountries,
-        ),
-      ),
-    );
-    if (result != null) {
-      setState(() {
-        _selectedCountry = result;
-        _phoneController.clear();
-        _isPhoneValid = false;
       });
     }
   }
@@ -207,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   onTap: () {
                     Navigator.pop(sheetContext);
-                    KometApp.stateOf(
+                    FluxApp.stateOf(
                       appContext,
                     )?.applyLocale(const Locale('ru'));
                   },
@@ -223,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   onTap: () {
                     Navigator.pop(sheetContext);
-                    KometApp.stateOf(
+                    FluxApp.stateOf(
                       appContext,
                     )?.applyLocale(const Locale('en'));
                   },
@@ -281,27 +275,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 16),
                     Expanded(
                       child: NotificationListener<ScrollUpdateNotification>(
-                        onNotification:
-                            (ScrollUpdateNotification notification) {
-                              if (_isTOSRead) return false;
-                              final metrics = notification.metrics;
-                              if (metrics.maxScrollExtent > 0) {
-                                double newProgress =
-                                    metrics.pixels / metrics.maxScrollExtent;
-                                newProgress = newProgress.clamp(0.0, 1.0);
-                                if (newProgress >= 0.99 && !_isTOSRead) {
-                                  _markTOSRead();
-                                  setModalState(() {
-                                    progress = 1.0;
-                                  });
-                                } else {
-                                  setModalState(() {
-                                    progress = newProgress;
-                                  });
-                                }
-                              }
-                              return false;
-                            },
+                        onNotification: (ScrollUpdateNotification notification) {
+                          if (_isTOSRead) return false;
+                          final metrics = notification.metrics;
+                          if (metrics.maxScrollExtent > 0) {
+                            double newProgress =
+                                metrics.pixels / metrics.maxScrollExtent;
+                            newProgress = newProgress.clamp(0.0, 1.0);
+                            if (newProgress >= 0.99 && !_isTOSRead) {
+                              _markTOSRead();
+                              setModalState(() {
+                                progress = 1.0;
+                              });
+                            } else {
+                              setModalState(() {
+                                progress = newProgress;
+                              });
+                            }
+                          }
+                          return false;
+                        },
                         child: ListView(
                           controller: scrollController,
                           children: [
@@ -715,353 +708,466 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  List<CountryName> get _filteredCountries {
+    final allowed = api.registrationCountries;
+    if (_countrySearchQuery.trim().isEmpty) return allowed;
+    final query = _countrySearchQuery.trim().toLowerCase();
+    return allowed.where((c) {
+      final name = _countryDisplayName(c).toLowerCase();
+      final code = c.phoneCode.toLowerCase();
+      return name.contains(query) || code.contains(query);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: cs.surface,
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onVerticalDragEnd: (details) {
-          if (details.primaryVelocity != null &&
-              details.primaryVelocity! < -500) {
-            _showTOS(context);
-          }
-        },
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
+      body: SafeArea(
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 350),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          child: !_hasAcceptedWelcome
+              ? _buildWelcomeScreen(context)
+              : _buildPhoneEntryScreen(context),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeScreen(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      key: const ValueKey('WelcomeScreenView'),
+      padding: const EdgeInsets.symmetric(horizontal: 28.0),
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: () => _showSecurityOptions(context),
+                icon: Icon(
+                  Symbols.admin_panel_settings,
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
+              IconButton(
+                onPressed: _showLanguagePicker,
+                icon: Icon(
+                  Symbols.language,
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _onLogoTap,
+            child: _buildFluxBubbleLogo(size: 130),
+          ),
+          const SizedBox(height: 36),
+          Text(
+            'Добро пожаловать\nв flux',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: cs.onSurface,
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: TextStyle(
+                  color: cs.onSurfaceVariant,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+                children: [
+                  const TextSpan(
+                    text: 'Ознакомьтесь с нашими ',
+                  ),
+                  TextSpan(
+                    text: 'Политиками конфиденциальности',
+                    style: TextStyle(
+                      color: cs.primary,
+                      fontWeight: FontWeight.w600,
                     ),
-                    child: IntrinsicHeight(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 44),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              if (Navigator.canPop(context) ||
-                                  widget.returnToAccountId != null)
-                                IconButton(
-                                  onPressed: _onBackPressed,
-                                  icon: Icon(
-                                    Symbols.arrow_back,
-                                    color: cs.onSurfaceVariant,
-                                    weight: 400,
-                                  ),
-                                )
-                              else
-                                const SizedBox.shrink(),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () =>
-                                        _showSecurityOptions(context),
-                                    icon: Icon(
-                                      Symbols.admin_panel_settings,
-                                      color: cs.onSurfaceVariant,
-                                      weight: 400,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: _showLanguagePicker,
-                                    icon: Icon(
-                                      Symbols.language,
-                                      color: cs.onSurfaceVariant,
-                                      weight: 400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 74),
-                          Center(
-                            child: Column(
-                              children: [
-                                GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: _onLogoTap,
-                                  child: Image.asset(
-                                    'assets/komet.png',
-                                    height: 80,
-                                    color: cs.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  l10n.loginTitle,
-                                  style: TextStyle(
-                                    color: cs.onSurface,
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  l10n.loginSubtitle,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: cs.onSurfaceVariant,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 48),
-                          InkWell(
-                            onTap: _showCountryPicker,
-                            borderRadius: BorderRadius.circular(50),
-                            child: _buildInputField(
-                              label: l10n.loginCountry,
-                              content: Row(
-                                children: [
-                                  Text(
-                                    _countryDisplayName(_selectedCountry),
-                                    style: TextStyle(
-                                      color: cs.onSurface,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Icon(
-                                    Symbols.keyboard_arrow_down,
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 40),
-                          _buildInputField(
-                            label: l10n.loginPhoneNumber,
-                            content: Row(
-                              children: [
-                                Text(
-                                  _selectedCountry.phoneCode,
-                                  style: TextStyle(
-                                    color: cs.onSurface,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Container(
-                                  width: 1,
-                                  height: 24,
-                                  color: cs.outlineVariant,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: TextField(
-                                    key: ValueKey(_selectedCountry.code),
-                                    controller: _phoneController,
-                                    keyboardType: TextInputType.phone,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      PhoneInputFormatter(_selectedCountry),
-                                    ],
-                                    style: TextStyle(
-                                      color: cs.onSurface,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    decoration: InputDecoration(
-                                      hintText: _phoneMaskHint(
-                                        _selectedCountry,
-                                      ),
-                                      hintStyle: TextStyle(
-                                        color: cs.outline,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                    onChanged: (value) {
-                                      final digits = value.replaceAll(
-                                        RegExp(r'\D'),
-                                        '',
-                                      );
-                                      setState(() {
-                                        _isPhoneValid =
-                                            digits.length ==
-                                            _selectedCountry.phoneDigits;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          AnimatedSize(
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeOutCubic,
-                            alignment: Alignment.topLeft,
-                            child: _phoneError != null
-                                ? Padding(
-                                    padding: const EdgeInsets.only(bottom: 4),
-                                    child: Text(
-                                      _phoneError!,
-                                      style: TextStyle(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.error,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                          const SizedBox(height: 16),
-                          TextButton(
-                            onPressed: () => _showOtherLoginMethods(context),
-                            child: Text(
-                              l10n.loginOtherSignInMethods,
-                              style: TextStyle(
-                                color: cs.primary,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                          const Spacer(),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 24.0),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        color: cs.onSurface,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        height: 1.4,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: l10n.loginTermsIntro,
-                                          style: TextStyle(
-                                            color: cs.onSurface,
-                                            fontSize: 14,
-                                            height: 1.4,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: l10n.loginTermsLink,
-                                          style: TextStyle(
-                                            color: cs.primary,
-                                            fontSize: 14,
-                                            height: 1.4,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          recognizer: TapGestureRecognizer()
-                                            ..onTap = () => _showTOS(context),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: FloatingActionButton(
-                                  onPressed: !_isPhoneValid
-                                      ? null
-                                      : (_isOnline
-                                            ? _validateAndSubmit
-                                            : _notifyConnecting),
-                                  backgroundColor: _isPhoneValid
-                                      ? cs.primaryContainer
-                                      : cs.surfaceContainerHighest,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: _isPhoneValid && !_isOnline
-                                      ? SmallSpinner(
-                                          size: 24,
-                                          color: cs.onPrimaryContainer,
-                                        )
-                                      : Icon(
-                                          Symbols.arrow_forward,
-                                          color: _isPhoneValid
-                                              ? cs.onPrimaryContainer
-                                              : cs.onSurfaceVariant,
-                                        ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                        ],
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => _showTOS(context),
+                  ),
+                  const TextSpan(
+                    text: '. Нажмите "Принять и продолжить", чтобы принять ',
+                  ),
+                  TextSpan(
+                    text: 'Пользовательское соглашение',
+                    style: TextStyle(
+                      color: cs.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => _showTOS(context),
+                  ),
+                  const TextSpan(text: '.'),
+                ],
+              ),
+            ),
+          ),
+          const Spacer(),
+          InkWell(
+            onTap: () async {
+              await _markTOSRead();
+              setState(() => _hasAcceptedWelcome = true);
+            },
+            borderRadius: BorderRadius.circular(30),
+            child: Container(
+              width: double.infinity,
+              height: 54,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: cs.primary.withValues(alpha: 0.8),
+                  width: 1.5,
+                ),
+                color: cs.primaryContainer.withValues(alpha: 0.3),
+              ),
+              child: Text(
+                'Принять и продолжить',
+                style: TextStyle(
+                  color: cs.primary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhoneEntryScreen(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final filtered = _filteredCountries;
+
+    return Column(
+      key: const ValueKey('PhoneEntryScreenView'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                onPressed: _onBackPressed,
+                icon: Icon(Symbols.arrow_back, color: cs.onSurfaceVariant),
+              ),
+              GestureDetector(
+                onTap: _onLogoTap,
+                child: Text(
+                  'flux',
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () => _showOtherLoginMethods(context),
+                icon: Icon(Symbols.more_vert, color: cs.onSurfaceVariant),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Text(
+            'ВЕДИТЕ НОМЕР ТЕЛЕФОНА:',
+            style: TextStyle(
+              color: cs.onSurface,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Container(
+            height: 52,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: cs.primary,
+                width: 1.4,
+              ),
+              color: cs.surfaceContainerLowest,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                Text(
+                  _countryFlag(_selectedCountry.code),
+                  style: const TextStyle(fontSize: 22),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _selectedCountry.phoneCode,
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 1.2,
+                  height: 24,
+                  color: cs.outlineVariant,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    key: ValueKey(_selectedCountry.code),
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      PhoneInputFormatter(_selectedCountry),
+                    ],
+                    style: TextStyle(
+                      color: cs.onSurface,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: _phoneMaskHint(_selectedCountry),
+                      hintStyle: TextStyle(
+                        color: cs.outline.withValues(alpha: 0.6),
+                        fontSize: 16,
+                        letterSpacing: 1.2,
                       ),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
                     ),
+                    onChanged: (value) {
+                      final digits = value.replaceAll(RegExp(r'\D'), '');
+                      setState(() {
+                        _isPhoneValid =
+                            digits.length == _selectedCountry.phoneDigits;
+                      });
+                    },
+                  ),
+                ),
+                if (_isPhoneValid)
+                  IconButton(
+                    onPressed: _isOnline ? _validateAndSubmit : _notifyConnecting,
+                    icon: _isOnline
+                        ? Icon(Symbols.arrow_circle_right, color: cs.primary, size: 28)
+                        : SmallSpinner(size: 20, color: cs.primary),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        if (_phoneError != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(28, 6, 28, 0),
+            child: Text(
+              _phoneError!,
+              style: TextStyle(
+                color: cs.error,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+            itemCount: filtered.length,
+            separatorBuilder: (_, __) => Divider(
+              color: cs.outlineVariant.withValues(alpha: 0.3),
+              height: 1,
+            ),
+            itemBuilder: (context, index) {
+              final item = filtered[index];
+              final isSelected = item.code == _selectedCountry.code;
+
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedCountry = item;
+                    _phoneController.clear();
+                    _isPhoneValid = false;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        _countryFlag(item.code),
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _countryDisplayName(item),
+                          style: TextStyle(
+                            color: isSelected ? cs.primary : cs.onSurface,
+                            fontSize: 15,
+                            fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        item.phoneCode,
+                        style: TextStyle(
+                          color: isSelected ? cs.primary : cs.onSurfaceVariant,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
             },
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: cs.outlineVariant,
+                width: 1.2,
+              ),
+              color: cs.surfaceContainerLowest,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Icon(Symbols.search, color: cs.onSurfaceVariant, size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _countrySearchController,
+                    onChanged: (text) {
+                      setState(() => _countrySearchQuery = text);
+                    },
+                    style: TextStyle(
+                      color: cs.onSurface,
+                      fontSize: 14,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'ПОИСК ПО СТРАНЕ',
+                      hintStyle: TextStyle(
+                        color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      border: InputBorder.none,
+                      isDense: true,
+                    ),
+                  ),
+                ),
+                if (_countrySearchQuery.isNotEmpty)
+                  GestureDetector(
+                    onTap: () {
+                      _countrySearchController.clear();
+                      setState(() => _countrySearchQuery = '');
+                    },
+                    child: Icon(Symbols.close, color: cs.onSurfaceVariant, size: 18),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFluxBubbleLogo({required double size}) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: cs.primary.withValues(alpha: 0.5),
+          width: 2.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: cs.primary.withValues(alpha: 0.15),
+            blurRadius: 24,
+            spreadRadius: 4,
+          ),
+        ],
+      ),
+      child: Center(
+        child: Container(
+          width: size * 0.78,
+          height: size * 0.78,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              colors: [
+                Colors.teal.withValues(alpha: 0.25),
+                Colors.purple.withValues(alpha: 0.25),
+                Colors.lightGreen.withValues(alpha: 0.25),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            'flux',
+            style: TextStyle(
+              fontSize: size * 0.28,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -1,
+              color: cs.onSurface,
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildInputField({required String label, required Widget content}) {
-    final cs = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              width: double.infinity,
-              height: 54,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                border: Border.all(color: cs.primary, width: 1.5),
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: content,
-            ),
-            Positioned(
-              top: -10,
-              left: 20,
-              child: Container(
-                color: cs.surface,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: cs.primary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+  String _countryFlag(String countryCode) {
+    return countryCode.toUpperCase().runes.map((rune) {
+      return String.fromCharCode(rune + 127397);
+    }).join();
   }
 }
