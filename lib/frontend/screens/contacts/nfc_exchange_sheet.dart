@@ -7,6 +7,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../backend/modules/contacts.dart';
 import '../../../core/cache/info_cache.dart';
+import '../../../core/config/app_shape.dart';
 import '../../../core/contacts/device_contacts_service.dart';
 import '../../../core/nfc/nfc_exchange_service.dart';
 import '../../../core/storage/app_database.dart';
@@ -15,9 +16,8 @@ import '../../../l10n/app_localizations.dart';
 import '../../../main.dart';
 import '../../../models/contact_info.dart';
 import '../../widgets/custom_notification.dart';
-import '../../widgets/komet_avatar.dart';
+import '../../widgets/flux_avatar.dart';
 import '../../widgets/small_spinner.dart';
-import '../../../core/config/app_shape.dart';
 
 enum _Stage {
   checking,
@@ -190,15 +190,21 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const borderColor = Color(0xFFE2E5EB);
+
     return SizedBox(
       width: double.infinity,
       child: Material(
-        color: cs.surfaceContainerHigh,
+        color: Colors.white,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+          side: BorderSide(color: borderColor, width: 1.2),
         ),
         clipBehavior: Clip.antiAlias,
+        elevation: 8,
+        shadowColor: Colors.black.withValues(alpha: 0.12),
         child: SafeArea(
           bottom: false,
           child: Padding(
@@ -211,16 +217,17 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
                     Expanded(
                       child: Text(
                         AppLocalizations.of(context)!.nfcSheetTitle,
-                        style: TextStyle(
-                          color: cs.onSurface,
+                        style: const TextStyle(
+                          color: textColor,
                           fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
                         ),
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: Icon(Symbols.close, color: cs.onSurfaceVariant),
+                      icon: const Icon(Symbols.close, color: subtitleColor),
                     ),
                   ],
                 ),
@@ -237,7 +244,7 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
                     key: ValueKey(
                       _stage == _Stage.found ? 'found' : _stage.name,
                     ),
-                    child: _buildContent(cs),
+                    child: _buildContent(),
                   ),
                 ),
               ],
@@ -248,7 +255,7 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
     );
   }
 
-  Widget _buildContent(ColorScheme cs) {
+  Widget _buildContent() {
     final l10n = AppLocalizations.of(context)!;
     switch (_stage) {
       case _Stage.checking:
@@ -257,41 +264,51 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
           child: SmallSpinner(size: 36),
         );
       case _Stage.unsupported:
-        return _message(cs, Symbols.nfc, l10n.nfcUnsupported);
+        return _message(Symbols.nfc, l10n.nfcUnsupported);
       case _Stage.disabled:
-        return _message(cs, Symbols.nfc, l10n.nfcDisabled);
+        return _message(Symbols.nfc, l10n.nfcDisabled);
       case _Stage.failed:
-        return _message(cs, Symbols.bluetooth_disabled, _failReason);
+        return _message(Symbols.bluetooth_disabled, _failReason);
       case _Stage.scanning:
-        return _scanning(cs);
+        return _scanning();
       case _Stage.exchanging:
-        return _exchanging(cs);
+        return _exchanging();
       case _Stage.found:
       case _Stage.adding:
       case _Stage.added:
-        return _foundCard(cs);
+        return _foundCard();
     }
   }
 
-  Widget _message(ColorScheme cs, IconData icon, String text) {
+  Widget _message(IconData icon, String text) {
+    const subtitleColor = Color(0xFF757575);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 28),
       child: Column(
         children: [
-          Icon(icon, color: cs.onSurfaceVariant, size: 44),
+          Icon(icon, color: subtitleColor, size: 44),
           const SizedBox(height: 14),
           Text(
             text,
             textAlign: TextAlign.center,
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 15),
+            style: const TextStyle(
+              color: subtitleColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _scanning(ColorScheme cs) {
+  Widget _scanning() {
     final l10n = AppLocalizations.of(context)!;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
@@ -302,11 +319,11 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
             child: AnimatedBuilder(
               animation: _pulse,
               builder: (context, child) => CustomPaint(
-                painter: _RadarPainter(_pulse.value, cs.primary),
+                painter: _RadarPainter(_pulse.value, accentColor),
                 child: child,
               ),
-              child: Center(
-                child: Icon(Symbols.nfc, color: cs.primary, size: 48),
+              child: const Center(
+                child: Icon(Symbols.nfc, color: accentColor, size: 48),
               ),
             ),
           ),
@@ -314,25 +331,29 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
           Text(
             l10n.nfcScanningTitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: cs.onSurface,
+            style: const TextStyle(
+              color: textColor,
               fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             l10n.nfcScanningSubtitle,
             textAlign: TextAlign.center,
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+            style: const TextStyle(color: subtitleColor, fontSize: 13),
           ),
         ],
       ),
     );
   }
 
-  Widget _exchanging(ColorScheme cs) {
+  Widget _exchanging() {
     final l10n = AppLocalizations.of(context)!;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const accentColor = Color(0xFF1E88E5);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Column(
@@ -343,11 +364,11 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
             child: AnimatedBuilder(
               animation: _pulse,
               builder: (context, child) => CustomPaint(
-                painter: _RadarPainter(_pulse.value, cs.primary),
+                painter: _RadarPainter(_pulse.value, accentColor),
                 child: child,
               ),
-              child: Center(
-                child: Icon(Symbols.sync, color: cs.primary, size: 40),
+              child: const Center(
+                child: Icon(Symbols.sync, color: accentColor, size: 40),
               ),
             ),
           ),
@@ -355,26 +376,31 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
           Text(
             l10n.nfcExchangingTitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: cs.onSurface,
+            style: const TextStyle(
+              color: textColor,
               fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             l10n.nfcExchangingSubtitle,
             textAlign: TextAlign.center,
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+            style: const TextStyle(color: subtitleColor, fontSize: 13),
           ),
         ],
       ),
     );
   }
 
-  Widget _foundCard(ColorScheme cs) {
+  Widget _foundCard() {
     final l10n = AppLocalizations.of(context)!;
     final loading = _peerInfo == null && _stage == _Stage.found;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -388,13 +414,13 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
                 final t = _reveal.value;
                 final pop = Curves.elasticOut.transform(t.clamp(0.0, 1.0));
                 return CustomPaint(
-                  painter: _BurstPainter(t, cs.primary),
+                  painter: _BurstPainter(t, accentColor),
                   child: Center(
                     child: Transform.scale(scale: pop, child: child),
                   ),
                 );
               },
-              child: KometAvatar(
+              child: FluxAvatar(
                 name: _peerName(),
                 imageUrl: _peerInfo?.avatarUrl,
                 size: 92,
@@ -406,10 +432,11 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
           Text(
             _peerName(),
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: cs.onSurface,
+            style: const TextStyle(
+              color: textColor,
               fontSize: 20,
               fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -418,23 +445,31 @@ class _NfcExchangeSheetState extends State<NfcExchangeSheet>
           Text(
             formatPhone(_peerPhone) ??
                 l10n.nfcPeerIdFallback('${_peerId ?? ''}'),
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+            style: const TextStyle(color: subtitleColor, fontSize: 13),
           ),
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
+            height: 48,
             child: FilledButton(
               onPressed: (_stage == _Stage.adding || loading) ? null : _add,
               style: FilledButton.styleFrom(
+                backgroundColor: primaryColor,
+                disabledBackgroundColor: const Color(0xFFE2E5EB),
                 shape: AppShape.buttonBorder,
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                elevation: 0,
               ),
               child: _stage == _Stage.adding
-                  ? const SmallSpinner(size: 20)
+                  ? const SmallSpinner(size: 20, color: Colors.white)
                   : Text(
                       _stage == _Stage.added
                           ? l10n.nfcAdded
                           : l10n.nfcAddContact,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
             ),
           ),
