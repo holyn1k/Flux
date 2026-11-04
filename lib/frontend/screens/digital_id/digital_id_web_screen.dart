@@ -36,7 +36,7 @@ class DigitalIdWebScreen extends StatelessWidget {
       loader: () async => initialLaunch ?? await webAppModule.fetchDigitalId(),
       onExternalCallback: webAppModule.handleExternalCallback,
       onConsoleMessage: (controller, consoleMessage) {
-        final msg = '[DID] ${consoleMessage.message}';
+        final msg = '[FLUX-DID] ${consoleMessage.message}';
         final lvl = consoleMessage.messageLevel.toString().toUpperCase();
         if (lvl.contains('ERROR')) {
           logger.e(msg);
@@ -48,7 +48,7 @@ class DigitalIdWebScreen extends StatelessWidget {
       },
       onLoadStart: (controller, url) {
         if (url != null) {
-          logger.i('[DID] loadStart: ${url.scheme}://${url.host}${url.path}');
+          logger.i('[FLUX-DID] loadStart: ${url.scheme}://${url.host}${url.path}');
         }
       },
       shouldOverrideUrlLoading: (_, action, _) async {
@@ -57,7 +57,7 @@ class DigitalIdWebScreen extends StatelessWidget {
         final scheme = uri?.scheme ?? '';
         if (kDebugMode) {
           debugPrint(
-            '[KOMET-DID] nav: ${url.length > 140 ? url.substring(0, 140) : url}',
+            '[FLUX-DID] nav: ${url.length > 140 ? url.substring(0, 140) : url}',
           );
         }
         if (scheme != 'http' && scheme != 'https') {
