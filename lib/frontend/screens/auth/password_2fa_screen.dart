@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flux/backend/modules/account/account_models.dart';
+import 'package:flux/core/protocol/packet.dart';
+import 'package:flux/l10n/app_localizations.dart';
+import 'package:flux/main.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import '../../../backend/modules/account/account_models.dart';
-import '../../../core/protocol/packet.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../main.dart';
 import '../../widgets/animated_slash_icon.dart';
 import '../../widgets/custom_notification.dart';
 import '../../widgets/login_success_screen.dart';
@@ -116,73 +116,134 @@ class _Password2FAScreenState extends State<Password2FAScreen>
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+    const inputBgColor = Color(0xFFF7F8FA);
+    const inputBorderColor = Color(0xFFD6D9E0);
+
+    final hasText = _passwordController.text.isNotEmpty;
+
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Symbols.arrow_back, color: cs.onSurfaceVariant),
+          icon: const Icon(Symbols.arrow_back, color: textColor),
           onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'flux',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
         ),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 12),
+              const Text(
                 'Двухфакторная аутентификация',
                 style: TextStyle(
-                  color: cs.onSurface,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
+                  color: textColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
+              const SizedBox(height: 8),
+              const Text(
                 'Введите пароль для завершения входа',
                 style: TextStyle(
-                  color: cs.outline,
+                  color: subtitleColor,
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   height: 1.4,
                 ),
               ),
               if (widget.hint != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  'Подсказка: ${widget.hint}',
-                  style: TextStyle(
-                    color: cs.tertiary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0F4F8),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFD1DBE5)),
+                  ),
+                  child: Text(
+                    'Подсказка: ${widget.hint}',
+                    style: const TextStyle(
+                      color: Color(0xFF37474F),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               TextField(
                 controller: _passwordController,
                 obscureText: !_isPasswordVisible,
                 autofocus: true,
                 enabled: !_isLoading,
+                style: const TextStyle(
+                  color: textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
                 decoration: InputDecoration(
                   hintText: 'Пароль',
+                  hintStyle: const TextStyle(
+                    color: Color(0xFF9E9E9E),
+                    fontSize: 15,
+                  ),
                   filled: true,
-                  fillColor: cs.surfaceContainerHigh,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                  fillColor: inputBgColor,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: inputBorderColor,
+                      width: 1.2,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: accentColor,
+                      width: 1.8,
+                    ),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: inputBorderColor,
+                      width: 1.2,
+                    ),
                   ),
                   suffixIcon: IconButton(
                     icon: AnimatedSlashIcon(
                       icon: Symbols.visibility,
                       slashedIcon: Symbols.visibility_off,
                       slashed: _isPasswordVisible,
-                      color: cs.onSurfaceVariant,
+                      color: const Color(0xFF616161),
                     ),
                     onPressed: () {
                       setState(() {
@@ -191,6 +252,7 @@ class _Password2FAScreenState extends State<Password2FAScreen>
                     },
                   ),
                 ),
+                onChanged: (_) => setState(() {}),
                 onSubmitted: (_) => _checkPassword(),
               ),
               const Spacer(),
@@ -198,26 +260,26 @@ class _Password2FAScreenState extends State<Password2FAScreen>
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   FloatingActionButton(
-                    onPressed: _isLoading ? null : _checkPassword,
-                    backgroundColor: _passwordController.text.isNotEmpty
-                        ? cs.primaryContainer
-                        : cs.surfaceContainerHighest,
+                    onPressed: (_isLoading || !hasText) ? null : _checkPassword,
+                    backgroundColor: hasText
+                        ? primaryColor
+                        : const Color(0xFFE2E5EB),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: _isLoading
-                        ? SmallSpinner(size: 24, color: cs.onPrimaryContainer)
+                        ? const SmallSpinner(size: 24, color: Colors.white)
                         : Icon(
                             Symbols.arrow_forward,
-                            color: _passwordController.text.isNotEmpty
-                                ? cs.onPrimaryContainer
-                                : cs.onSurfaceVariant,
+                            color: hasText
+                                ? Colors.white
+                                : const Color(0xFF9E9E9E),
                           ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
             ],
           ),
         ),
