@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:komet/backend/api.dart';
-import 'package:komet/core/config/proxy_config.dart';
-import 'package:komet/l10n/app_localizations.dart';
+import 'package:flux/backend/api.dart';
+import 'package:flux/core/config/proxy_config.dart';
+import 'package:flux/l10n/app_localizations.dart';
 
 import '../../../main.dart';
 import '../../widgets/custom_notification.dart';
@@ -114,99 +114,131 @@ class _ProxySettingsSheetState extends State<ProxySettingsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
+
     final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final isActive = _selectedType != ProxyType.none;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: bottomInset),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Center(
-                child: SheetGrabber(margin: EdgeInsets.only(bottom: 16)),
-              ),
-              Text(
-                l10n.proxySettingsTitle,
-                style: TextStyle(
-                  color: cs.onSurface,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Center(
+                  child: SheetGrabber(margin: EdgeInsets.only(bottom: 16)),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l10n.proxyCurrentState(_appliedLabel(l10n)),
-                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
-              ),
-              const SizedBox(height: 20),
+                Text(
+                  l10n.proxySettingsTitle,
+                  style: const TextStyle(
+                    color: textColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.proxyCurrentState(_appliedLabel(l10n)),
+                  style: const TextStyle(
+                    color: subtitleColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 20),
 
-              // Proxy type selector
-              _buildTypeSelector(cs, l10n),
-              const SizedBox(height: 16),
+                // Proxy type selector
+                _buildTypeSelector(l10n),
+                const SizedBox(height: 16),
 
-              // Fields shown only when proxy is enabled
-              AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                alignment: Alignment.topCenter,
-                child: isActive
-                    ? Column(
-                        children: [
-                          LabeledSettingsField(
-                            controller: _hostController,
-                            label: l10n.proxyHostLabel,
-                            hintText: '127.0.0.1',
-                            keyboardType: TextInputType.url,
-                            enabled: !_busy,
-                          ),
-                          const SizedBox(height: 16),
-                          LabeledSettingsField(
-                            controller: _portController,
-                            label: l10n.proxyPortLabel,
-                            hintText: _selectedType == ProxyType.socks5
-                                ? '1080'
-                                : '8080',
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            enabled: !_busy,
-                          ),
-                          const SizedBox(height: 16),
-                          LabeledSettingsField(
-                            controller: _usernameController,
-                            label: l10n.proxyUsernameLabel,
-                            keyboardType: TextInputType.text,
-                            enabled: !_busy,
-                          ),
-                          const SizedBox(height: 16),
-                          LabeledSettingsField(
-                            controller: _passwordController,
-                            label: l10n.proxyPasswordLabel,
-                            keyboardType: TextInputType.visiblePassword,
-                            obscureText: true,
-                            enabled: !_busy,
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
-              ),
+                // Fields shown only when proxy is enabled
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  alignment: Alignment.topCenter,
+                  child: isActive
+                      ? Column(
+                          children: [
+                            LabeledSettingsField(
+                              controller: _hostController,
+                              label: l10n.proxyHostLabel,
+                              hintText: '127.0.0.1',
+                              keyboardType: TextInputType.url,
+                              enabled: !_busy,
+                            ),
+                            const SizedBox(height: 14),
+                            LabeledSettingsField(
+                              controller: _portController,
+                              label: l10n.proxyPortLabel,
+                              hintText: _selectedType == ProxyType.socks5
+                                  ? '1080'
+                                  : '8080',
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              enabled: !_busy,
+                            ),
+                            const SizedBox(height: 14),
+                            LabeledSettingsField(
+                              controller: _usernameController,
+                              label: l10n.proxyUsernameLabel,
+                              keyboardType: TextInputType.text,
+                              enabled: !_busy,
+                            ),
+                            const SizedBox(height: 14),
+                            LabeledSettingsField(
+                              controller: _passwordController,
+                              label: l10n.proxyPasswordLabel,
+                              keyboardType: TextInputType.visiblePassword,
+                              obscureText: true,
+                              enabled: !_busy,
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                ),
 
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: (_busy || !(isActive || _applied.isEnabled))
-                    ? null
-                    : () => _apply(l10n),
-                child: Text(isActive ? l10n.proxyApply : l10n.proxyDisable),
-              ),
-            ],
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 50,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      disabledBackgroundColor: const Color(0xFFE2E5EB),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: (_busy || !(isActive || _applied.isEnabled))
+                        ? null
+                        : () => _apply(l10n),
+                    child: Text(
+                      isActive ? l10n.proxyApply : l10n.proxyDisable,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -221,7 +253,7 @@ class _ProxySettingsSheetState extends State<ProxySettingsSheet> {
     return '$type · ${_applied.host}:${_applied.port}';
   }
 
-  Widget _buildTypeSelector(ColorScheme cs, AppLocalizations l10n) {
+  Widget _buildTypeSelector(AppLocalizations l10n) {
     final labels = {
       ProxyType.none: l10n.proxyTypeNone,
       ProxyType.socks5: l10n.proxyTypeSocks5,
@@ -230,8 +262,9 @@ class _ProxySettingsSheetState extends State<ProxySettingsSheet> {
 
     return Container(
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF3F4F7),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE4E7ED), width: 1),
       ),
       padding: const EdgeInsets.all(4),
       child: Row(
@@ -244,14 +277,25 @@ class _ProxySettingsSheetState extends State<ProxySettingsSheet> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
-                  color: selected ? cs.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(9),
+                  color: selected ? Colors.white : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: selected
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.06),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
+                          ),
+                        ]
+                      : null,
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   labels[type]!,
                   style: TextStyle(
-                    color: selected ? cs.onPrimary : cs.onSurfaceVariant,
+                    color: selected
+                        ? const Color(0xFF1A1A1A)
+                        : const Color(0xFF6B7280),
                     fontSize: 13,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                   ),
