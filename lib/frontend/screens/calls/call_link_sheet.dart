@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'package:komet/backend/modules/calls.dart';
-import 'package:komet/frontend/screens/chats/chat_list_screen.dart';
-import 'package:komet/frontend/screens/contacts/contact_sheet_common.dart';
-import 'package:komet/frontend/widgets/custom_notification.dart';
-import 'package:komet/frontend/widgets/small_spinner.dart';
-import 'package:komet/l10n/app_localizations.dart';
-import 'package:komet/main.dart' show messagesModule;
+import 'package:flux/backend/modules/calls.dart';
+import 'package:flux/frontend/screens/chats/chat_list_screen.dart';
+import 'package:flux/frontend/screens/contacts/contact_sheet_common.dart';
+import 'package:flux/frontend/widgets/custom_notification.dart';
+import 'package:flux/frontend/widgets/small_spinner.dart';
+import 'package:flux/l10n/app_localizations.dart';
+import 'package:flux/main.dart' show messagesModule;
 import '../../../core/config/app_shape.dart';
 
 Future<bool> showCreatedCallSheet(
@@ -42,7 +42,7 @@ class _CreatedCallCardState extends State<_CreatedCallCard> {
     showCustomNotification(context, message);
   }
 
-  Future<void> _sendInMax() async {
+  Future<void> _sendInFlux() async {
     if (_sending) return;
     final target = await openForwardScreen(context: context);
     if (target == null || !mounted) return;
@@ -62,33 +62,35 @@ class _CreatedCallCardState extends State<_CreatedCallCard> {
     );
   }
 
-  Widget _action(
-    ColorScheme cs, {
+  Widget _action({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
     bool busy = false,
   }) {
+    const textColor = Color(0xFF1A1A1A);
+    const accentColor = Color(0xFF1E88E5);
+
     return InkWell(
       onTap: busy ? null : onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         child: Row(
           children: [
             SizedBox(
               width: 24,
               height: 24,
               child: busy
-                  ? SmallSpinner(size: 24, color: cs.primary)
-                  : Icon(icon, color: cs.primary, size: 24),
+                  ? const SmallSpinner(size: 22, color: accentColor)
+                  : Icon(icon, color: accentColor, size: 24),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(
-                  color: cs.primary,
-                  fontSize: 16,
+                style: const TextStyle(
+                  color: textColor,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
                 maxLines: 1,
@@ -103,7 +105,12 @@ class _CreatedCallCardState extends State<_CreatedCallCard> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+    const cardBorderColor = Color(0xFFE2E5EB);
+    const actionBgColor = Color(0xFFF7F8FA);
+
     final l10n = AppLocalizations.of(context)!;
     final width = MediaQuery.sizeOf(context).width;
     final title = widget.call.callName ?? l10n.callLinkGroupCall;
@@ -116,8 +123,16 @@ class _CreatedCallCardState extends State<_CreatedCallCard> {
           child: Container(
             width: width > 420 ? 380 : double.infinity,
             decoration: BoxDecoration(
-              color: cs.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(22),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: cardBorderColor, width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             clipBehavior: Clip.antiAlias,
             child: Padding(
@@ -130,80 +145,96 @@ class _CreatedCallCardState extends State<_CreatedCallCard> {
                     height: 88,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          cs.primary,
-                          Color.alphaBlend(
-                            Colors.white.withValues(alpha: 0.25),
-                            cs.primary,
-                          ),
+                          Color(0xFF2C3E50),
+                          Color(0xFF4A6572),
                         ],
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF2C3E50).withValues(alpha: 0.25),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Symbols.call,
                       fill: 1,
-                      color: cs.onPrimary,
+                      color: Colors.white,
                       size: 40,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
                   Text(
                     title,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: cs.onSurface,
+                    style: const TextStyle(
+                      color: textColor,
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
                     widget.call.url,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: cs.primary, fontSize: 14),
+                    style: const TextStyle(
+                      color: accentColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Container(
                     decoration: BoxDecoration(
-                      color: cs.surfaceContainerHighest,
+                      color: actionBgColor,
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: cardBorderColor, width: 1),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Column(
                       children: [
                         _action(
-                          cs,
                           icon: Symbols.content_copy,
                           label: l10n.sharedCopyLink,
                           onTap: _copy,
                         ),
+                        Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: cardBorderColor.withValues(alpha: 0.8),
+                        ),
                         _action(
-                          cs,
                           icon: Symbols.reply,
                           label: l10n.callLinkSendInMax,
-                          onTap: _sendInMax,
+                          onTap: _sendInFlux,
                           busy: _sending,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: FilledButton(
                       onPressed: () => Navigator.of(context).pop(true),
                       style: FilledButton.styleFrom(
+                        backgroundColor: primaryColor,
                         shape: AppShape.buttonBorder,
+                        elevation: 0,
                       ),
                       child: Text(
                         l10n.callLinkStart,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                     ),
