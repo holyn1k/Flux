@@ -66,7 +66,7 @@ Future<StoryOwnerInfo?> fetchStoryOwnerInfo(StoryOwner owner) async {
 }
 
 /// Резолвит имя/аватар владельца истории (из кэша, с дозагрузкой) и отдаёт их
-/// в [builder]. [override] позволяет подставить готовые данные (напр. свой
+/// в [builder]. [overrideInfo] позволяет подставить готовые данные (напр. свой
 /// профиль) без обращения к кэшу.
 class StoryOwnerBuilder extends StatefulWidget {
   final StoryOwner owner;
