@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:komet/backend/api.dart';
-import 'package:komet/core/config/config.dart';
-import 'package:komet/l10n/app_localizations.dart';
+import 'package:flux/backend/api.dart';
+import 'package:flux/core/config/config.dart';
+import 'package:flux/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../main.dart';
@@ -119,100 +119,151 @@ class _ServerSettingsSheetState extends State<ServerSettingsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const subtitleColor = Color(0xFF757575);
+    const primaryColor = Color(0xFF2C3E50);
+    const accentColor = Color(0xFF1E88E5);
+    const cardBgColor = Color(0xFFF7F8FA);
+    const cardBorderColor = Color(0xFFE5E8EE);
+
     final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    return Padding(
-      padding: EdgeInsets.only(bottom: bottomInset),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Center(
-                child: SheetGrabber(margin: EdgeInsets.only(bottom: 16)),
-              ),
-              Text(
-                l10n.serverSettingsTitle,
-                style: TextStyle(
-                  color: cs.onSurface,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Center(
+                  child: SheetGrabber(margin: EdgeInsets.only(bottom: 16)),
                 ),
-              ),
-              const SizedBox(height: 20),
-              LabeledSettingsField(
-                controller: _hostController,
-                label: l10n.serverHostLabel,
-                hintText: ServerConfig.defaultHost,
-                keyboardType: TextInputType.url,
-                enabled: !_busy,
-              ),
-              const SizedBox(height: 16),
-              LabeledSettingsField(
-                controller: _portController,
-                label: l10n.serverPortLabel,
-                hintText: '${ServerConfig.defaultPort}',
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                enabled: !_busy,
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
-                decoration: BoxDecoration(
-                  color: cs.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(16),
+                Text(
+                  l10n.serverSettingsTitle,
+                  style: const TextStyle(
+                    color: textColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.serverTrustMincifryTitle,
-                            style: TextStyle(
-                              color: cs.onSurface,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
+                const SizedBox(height: 20),
+                LabeledSettingsField(
+                  controller: _hostController,
+                  label: l10n.serverHostLabel,
+                  hintText: ServerConfig.defaultHost,
+                  keyboardType: TextInputType.url,
+                  enabled: !_busy,
+                ),
+                const SizedBox(height: 14),
+                LabeledSettingsField(
+                  controller: _portController,
+                  label: l10n.serverPortLabel,
+                  hintText: '${ServerConfig.defaultPort}',
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  enabled: !_busy,
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+                  decoration: BoxDecoration(
+                    color: cardBgColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: cardBorderColor, width: 1.2),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.serverTrustMincifryTitle,
+                              style: const TextStyle(
+                                color: textColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            l10n.serverTrustMincifrySubtitle,
-                            style: TextStyle(
-                              color: cs.onSurfaceVariant,
-                              fontSize: 12.5,
-                              height: 1.3,
+                            const SizedBox(height: 2),
+                            Text(
+                              l10n.serverTrustMincifrySubtitle,
+                              style: const TextStyle(
+                                color: subtitleColor,
+                                fontSize: 12.5,
+                                height: 1.3,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Switch(
+                        value: _trustMincifryCa,
+                        activeTrackColor: primaryColor,
+                        activeThumbColor: Colors.white,
+                        onChanged: _busy
+                            ? null
+                            : (v) => setState(() => _trustMincifryCa = v),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  height: 50,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      disabledBackgroundColor: const Color(0xFFE2E5EB),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: _busy ? null : () => _apply(l10n),
+                    child: Text(
+                      l10n.serverApply,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Switch(
-                      value: _trustMincifryCa,
-                      onChanged: _busy
-                          ? null
-                          : (v) => setState(() => _trustMincifryCa = v),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: _busy ? null : () => _apply(l10n),
-                child: Text(l10n.serverApply),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: _busy ? null : () => _resetToDefault(l10n),
-                child: Text(l10n.serverUseDefault),
-              ),
-            ],
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 50,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: cardBorderColor, width: 1.2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: _busy ? null : () => _resetToDefault(l10n),
+                    child: Text(
+                      l10n.serverUseDefault,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
