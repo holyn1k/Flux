@@ -15,20 +15,20 @@ import '../../../core/calls/call_controller.dart';
 import '../../../core/calls/call_info.dart';
 import '../../../core/calls/call_session.dart';
 import '../../../core/config/app_colors.dart';
+import '../../../core/config/app_fonts.dart';
 import '../../../core/config/call_no_mute.dart';
 import '../../../core/utils/format.dart';
 import '../../../core/utils/screen_wake.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../widgets/animated_slash_icon.dart';
 import '../../widgets/call_video_view.dart';
 import '../../widgets/custom_notification.dart';
 import '../../widgets/glossy_pill.dart';
-import '../../widgets/animated_slash_icon.dart';
 import '../../widgets/sheet_helpers.dart';
 import '../../widgets/small_spinner.dart';
 import 'call_mic_sheet.dart';
 import 'call_participants_sheet.dart';
-import 'komet_hub.dart';
-import '../../../core/config/app_fonts.dart';
+import 'flux_hub.dart';
 
 class CallScreen extends StatefulWidget {
   final String name;
@@ -57,7 +57,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   StreamSubscription<CallSessionState>? _stateSub;
   StreamSubscription<void>? _canceledSub;
   StreamSubscription<void>? _infoSub;
-  StreamSubscription<void>? _kometSub;
+  StreamSubscription<void>? _fluxSub;
   StreamSubscription<CallChatMessage>? _chatSub;
   StreamSubscription<MediaStream>? _remoteStreamSub;
   bool _chatOpen = false;
@@ -77,9 +77,6 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   bool _localRendererReady = false;
   bool _videoAttached = false;
   MediaStream? _pendingStream;
-
-  Color? _seedKey;
-  ColorScheme? _scheme;
 
   late String _name = widget.name;
   late String? _avatarUrl = widget.avatarUrl;
@@ -224,18 +221,6 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     }
   }
 
-  ColorScheme _darkScheme(BuildContext context) {
-    final seed = Theme.of(context).colorScheme.primary;
-    if (_seedKey != seed || _scheme == null) {
-      _seedKey = seed;
-      _scheme = ColorScheme.fromSeed(
-        seedColor: seed,
-        brightness: Brightness.dark,
-      );
-    }
-    return _scheme!;
-  }
-
   void _bind(CallSession session) {
     _session = session;
     _state = session.currentState;
@@ -252,10 +237,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     });
     _remoteStreamSub = session.remoteStreamStream.listen(_attachStream);
     _tileStreamSub = session.participantStreamUpdates.listen(_onTileStream);
-    _kometSub = session.peerKometDetected.listen((_) => _showKometBadge());
+    _fluxSub = session.peerKometDetected.listen((_) => _showFluxBadge());
     _chatSub = session.chatMessages.listen(_onChatMessage);
     if (session.peerIsKomet) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _showKometBadge());
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showFluxBadge());
     }
     final existing = session.remoteStream;
     if (existing != null) _attachStream(existing);
@@ -276,10 +261,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _showKometBadge() {
+  void _showFluxBadge() {
     if (!mounted) return;
-    final l10n = AppLocalizations.of(context)!;
-    showCustomNotification(context, l10n.callKometDetectedNotification);
+    showCustomNotification(context, 'Собеседник использует Flux');
   }
 
   void _onChatMessage(CallChatMessage message) {
@@ -287,11 +271,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     showCustomNotification(context, message.text);
   }
 
-  Future<void> _openKometHub() async {
+  Future<void> _openFluxHub() async {
     final session = _session;
     if (session == null) return;
     setState(() => _chatOpen = true);
-    await showKometHub(context, session: session, scheme: _darkScheme(context));
+    await showFluxHub(
+      context,
+      session: session,
+      scheme: Theme.of(context).colorScheme,
+    );
     if (mounted) setState(() => _chatOpen = false);
   }
 
@@ -428,7 +416,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     _stateSub?.cancel();
     _canceledSub?.cancel();
     _infoSub?.cancel();
-    _kometSub?.cancel();
+    _fluxSub?.cancel();
     _chatSub?.cancel();
     _remoteStreamSub?.cancel();
     _tileStreamSub?.cancel();
@@ -453,7 +441,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     showCallParticipantsSheet(
       context,
       session: session,
-      scheme: _darkScheme(context),
+      scheme: Theme.of(context).colorScheme,
       resolve: (p) {
         if (p.isSelf) {
           return CallParticipantView(
@@ -479,72 +467,65 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     showCallMicrophoneSheet(
       context,
       session: session,
-      scheme: _darkScheme(context),
+      scheme: Theme.of(context).colorScheme,
     );
   }
 
   void _showInfoSheet() {
-    final cs = _darkScheme(context);
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: cs.surfaceContainerHigh,
-      shape: kSheetShape,
-      builder: (_) => Theme(
-        data: Theme.of(context).copyWith(colorScheme: cs),
-        child: _CallInfoSheet(
-          session: _session,
-          incoming: widget.incoming,
-          name: _displayName,
-          renderer: _remoteRenderer,
-        ),
+      showDragHandle: false,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => _CallInfoSheet(
+        session: _session,
+        incoming: widget.incoming,
+        name: _displayName,
+        renderer: _remoteRenderer,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final cs = _darkScheme(context);
     final group = _isGroup && !_incomingPending;
 
     final Widget body = group
-        ? _buildGroupBody(cs)
+        ? _buildGroupBody()
         : AnimatedBuilder(
             animation: _videoController,
             builder: (context, _) => _buildBody(
-              cs,
-              avatar: _buildAvatar(cs),
-              name: _buildName(cs),
-              status: _buildStatus(cs),
-              peerBar: _peerStateBar(cs),
-              controls: _buildControls(cs),
+              avatar: _buildAvatar(),
+              name: _buildName(),
+              status: _buildStatus(),
+              peerBar: _peerStateBar(),
+              controls: _buildControls(),
             ),
           );
 
-    return Theme(
-      data: Theme.of(context).copyWith(colorScheme: cs),
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light.copyWith(
-          statusBarColor: Colors.transparent,
-          systemNavigationBarColor: cs.surface,
-          systemNavigationBarIconBrightness: Brightness.light,
-        ),
-        child: Scaffold(
-          backgroundColor: cs.surface,
-          body: Stack(
-            children: [
-              body,
-              if (_session?.localVideo == true || _session?.localScreen == true)
-                _localPreview(cs),
-            ],
-          ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            body,
+            if (_session?.localVideo == true || _session?.localScreen == true)
+              _localPreview(),
+          ],
         ),
       ),
     );
   }
 
-  Widget _localPreview(ColorScheme cs) {
+  Widget _localPreview() {
     return Positioned(
       right: 16,
       top: MediaQuery.of(context).padding.top + 56,
@@ -554,55 +535,62 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           height: 140,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            color: cs.surfaceContainerHighest,
-            border: Border.all(color: cs.outlineVariant, width: 1),
+            borderRadius: BorderRadius.circular(16),
+            color: const Color(0xFFF7F8FA),
+            border: Border.all(color: const Color(0xFFD6D9E0), width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: _localRendererReady && _localRenderer.srcObject != null
               ? CallVideoView(
                   renderer: _localRenderer,
                   mirror: _session?.localScreen != true,
                   objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                  placeholder: _localPreviewIcon(cs),
+                  placeholder: _localPreviewIcon(),
                 )
-              : _localPreviewIcon(cs),
+              : _localPreviewIcon(),
         ),
       ),
     );
   }
 
-  Widget _localPreviewIcon(ColorScheme cs) => Center(
+  Widget _localPreviewIcon() => const Center(
     child: Icon(
-      _session?.localScreen == true ? Symbols.screen_share : Symbols.videocam,
-      color: cs.onSurfaceVariant,
+      Symbols.videocam,
+      color: Color(0xFF757575),
       size: 28,
     ),
   );
 
-  Widget _buildGroupBody(ColorScheme cs) {
+  Widget _buildGroupBody() {
     final l10n = AppLocalizations.of(context)!;
     final participants = _session?.participants ?? const <CallParticipant>[];
     return SafeArea(
       child: Column(
         children: [
-          _buildTopBar(cs, 0),
+          _buildTopBar(0),
           const SizedBox(height: 4),
-          _groupHeader(cs, participants.length),
+          _groupHeader(participants.length),
           const SizedBox(height: 8),
           Expanded(
             child: participants.isEmpty
-                ? Center(child: _statusWithDots(cs, l10n.callStatusConnecting))
-                : _participantGrid(cs, participants),
+                ? Center(child: _statusWithDots(l10n.callStatusConnecting))
+                : _participantGrid(participants),
           ),
           const SizedBox(height: 12),
-          _activeControls(cs),
+          _activeControls(),
           const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Widget _groupHeader(ColorScheme cs, int count) {
+  Widget _groupHeader(int count) {
     final l10n = AppLocalizations.of(context)!;
     final String subtitle;
     if (count == 0) {
@@ -623,10 +611,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: cs.onSurface,
+              color: const Color(0xFF1A1A1A),
               fontSize: 24,
               fontWeight: FontWeight.w700,
               fontFamily: displayFontOf(context),
+              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 2),
@@ -640,14 +629,18 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 children: [
                   Text(
                     subtitle,
-                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+                    style: const TextStyle(
+                      color: Color(0xFF757575),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   if (count > 0) ...[
                     const SizedBox(width: 4),
-                    Icon(
+                    const Icon(
                       Symbols.chevron_right,
                       size: 16,
-                      color: cs.onSurfaceVariant,
+                      color: Color(0xFF757575),
                     ),
                   ],
                 ],
@@ -659,7 +652,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _participantGrid(ColorScheme cs, List<CallParticipant> ps) {
+  Widget _participantGrid(List<CallParticipant> ps) {
     final cols = ps.length <= 1
         ? 1
         : ps.length <= 4
@@ -671,11 +664,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       mainAxisSpacing: 14,
       crossAxisSpacing: 14,
       childAspectRatio: 0.84,
-      children: [for (final p in ps) _participantTile(cs, p)],
+      children: [for (final p in ps) _participantTile(p)],
     );
   }
 
-  Widget _participantTile(ColorScheme cs, CallParticipant p) {
+  Widget _participantTile(CallParticipant p) {
     final l10n = AppLocalizations.of(context)!;
     final ext = p.externalId;
     final info = ext != null ? _peerInfo[ext] : null;
@@ -691,22 +684,31 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     final showVideo =
         !p.isSelf && (p.videoEnabled || p.screenSharing) && renderer != null;
 
-    return GlossyPill(
-      color: cs.surfaceContainerHigh,
-      borderRadius: BorderRadius.circular(20),
-      depth: 6,
-      borderSide: speaking
-          ? const BorderSide(color: kSuccessGreen, width: 2.5)
-          : null,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F8FA),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: speaking ? kSuccessGreen : const Color(0xFFE2E5EB),
+          width: speaking ? 2.5 : 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       padding: EdgeInsets.all(showVideo ? 0 : 12),
+      clipBehavior: Clip.antiAlias,
       child: showVideo
-          ? _videoTile(cs, renderer, name, muted, p.handRaised, p.screenSharing)
-          : _avatarTile(cs, name, url, muted, p.handRaised, p.screenSharing),
+          ? _videoTile(renderer, name, muted, p.handRaised, p.screenSharing)
+          : _avatarTile(name, url, muted, p.handRaised, p.screenSharing),
     );
   }
 
   Widget _avatarTile(
-    ColorScheme cs,
     String name,
     String? url,
     bool muted,
@@ -727,16 +729,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      _circleAvatar(size, cs, name: name, url: url),
+                      _circleAvatar(size, name: name, url: url),
                       if (hand)
                         Positioned(
                           top: -2,
                           right: -2,
                           child: _tileBadge(
-                            cs,
                             Symbols.front_hand,
-                            cs.tertiaryContainer,
-                            cs.onTertiaryContainer,
+                            const Color(0xFFFFF3E0),
+                            const Color(0xFFF57C00),
                           ),
                         ),
                       if (screen)
@@ -744,10 +745,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                           top: -2,
                           left: -2,
                           child: _tileBadge(
-                            cs,
                             Symbols.screen_share,
-                            cs.primaryContainer,
-                            cs.onPrimaryContainer,
+                            const Color(0xFFE3F2FD),
+                            const Color(0xFF1E88E5),
                           ),
                         ),
                       if (muted)
@@ -755,10 +755,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                           bottom: -2,
                           right: -2,
                           child: _tileBadge(
-                            cs,
                             Symbols.mic_off,
-                            cs.surfaceContainerHighest,
-                            cs.onSurfaceVariant,
+                            const Color(0xFFFFEBEE),
+                            const Color(0xFFE53935),
                           ),
                         ),
                     ],
@@ -773,8 +772,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: cs.onSurface,
+          style: const TextStyle(
+            color: Color(0xFF1A1A1A),
             fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
@@ -784,7 +783,6 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   }
 
   Widget _videoTile(
-    ColorScheme cs,
     RTCVideoRenderer renderer,
     String name,
     bool muted,
@@ -792,14 +790,14 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     bool screen,
   ) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(18),
       child: Stack(
         fit: StackFit.expand,
         children: [
           CallVideoView(
             renderer: renderer,
             objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-            placeholder: ColoredBox(color: cs.surfaceContainerHighest),
+            placeholder: const ColoredBox(color: Color(0xFFF0F4F8)),
           ),
           Positioned(
             left: 8,
@@ -808,8 +806,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             child: Row(
               children: [
                 if (muted)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
+                  const Padding(
+                    padding: EdgeInsets.only(right: 4),
                     child: Icon(
                       Symbols.mic_off,
                       size: 16,
@@ -838,10 +836,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               top: 8,
               right: 8,
               child: _tileBadge(
-                cs,
                 Symbols.front_hand,
-                cs.tertiaryContainer,
-                cs.onTertiaryContainer,
+                const Color(0xFFFFF3E0),
+                const Color(0xFFF57C00),
               ),
             ),
           if (screen)
@@ -849,10 +846,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               top: 8,
               left: 8,
               child: _tileBadge(
-                cs,
                 Symbols.screen_share,
-                cs.primaryContainer,
-                cs.onPrimaryContainer,
+                const Color(0xFFE3F2FD),
+                const Color(0xFF1E88E5),
               ),
             ),
         ],
@@ -860,20 +856,19 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _tileBadge(ColorScheme cs, IconData icon, Color bg, Color fg) {
+  Widget _tileBadge(IconData icon, Color bg, Color fg) {
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: bg,
         shape: BoxShape.circle,
-        border: Border.all(color: cs.surface, width: 2),
+        border: Border.all(color: Colors.white, width: 2),
       ),
       child: Icon(icon, size: 14, color: fg, fill: 1),
     );
   }
 
-  Widget _buildBody(
-    ColorScheme cs, {
+  Widget _buildBody({
     required Widget avatar,
     required Widget name,
     required Widget status,
@@ -921,12 +916,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           ),
         if (t > 0.001)
           IgnorePointer(
-            child: Opacity(opacity: t, child: _videoScrim(cs)),
+            child: Opacity(opacity: t, child: _videoScrim()),
           ),
         SafeArea(
           child: Column(
             children: [
-              _buildTopBar(cs, t),
+              _buildTopBar(t),
               const Spacer(flex: 2),
               _collapse(t, avatar),
               SizedBox(height: 36 * (1 - t)),
@@ -962,17 +957,17 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _videoScrim(ColorScheme cs) {
+  Widget _videoScrim() {
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            cs.surface.withValues(alpha: 0.55),
+            Colors.white.withValues(alpha: 0.65),
             Colors.transparent,
             Colors.transparent,
-            cs.surface.withValues(alpha: 0.65),
+            Colors.white.withValues(alpha: 0.75),
           ],
           stops: const [0.0, 0.34, 0.70, 1.0],
         ),
@@ -980,13 +975,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTopBar(ColorScheme cs, double t) {
+  Widget _buildTopBar(double t) {
     final l10n = AppLocalizations.of(context)!;
     final showTimer =
         t > 0.001 &&
         _session != null &&
         _state == CallSessionState.active &&
         _session!.mediaConnected;
+    const iconColor = Color(0xFF1A1A1A);
+
     return SizedBox(
       height: 48,
       child: Stack(
@@ -996,11 +993,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             child: IconButton(
               onPressed: () => Navigator.of(context).maybePop(),
               tooltip: l10n.callTooltipMinimize,
-              icon: Icon(
+              icon: const Icon(
                 Symbols.close_fullscreen,
-                color: cs.onSurface,
+                color: iconColor,
                 weight: 500,
-                size: 26,
+                size: 24,
               ),
             ),
           ),
@@ -1012,33 +1009,33 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 children: [
                   if (_session?.peerIsKomet == true)
                     IconButton(
-                      onPressed: _openKometHub,
-                      tooltip: l10n.callTooltipKometHub,
-                      icon: Icon(
+                      onPressed: _openFluxHub,
+                      tooltip: 'Flux Hub',
+                      icon: const Icon(
                         Symbols.auto_awesome,
-                        color: cs.primary,
+                        color: Color(0xFF1E88E5),
                         weight: 500,
-                        size: 26,
+                        size: 24,
                       ),
                     ),
                   IconButton(
                     onPressed: _showMicrophones,
                     tooltip: l10n.callTooltipMicrophone,
-                    icon: Icon(
+                    icon: const Icon(
                       Symbols.settings_voice,
-                      color: cs.onSurface,
+                      color: iconColor,
                       weight: 500,
-                      size: 26,
+                      size: 24,
                     ),
                   ),
                   IconButton(
                     onPressed: _showInfoSheet,
                     tooltip: l10n.callInfoTitle,
-                    icon: Icon(
+                    icon: const Icon(
                       Symbols.info,
-                      color: cs.onSurface,
+                      color: iconColor,
                       weight: 500,
-                      size: 26,
+                      size: 24,
                     ),
                   ),
                 ],
@@ -1051,11 +1048,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 opacity: t,
                 child: _ElapsedText(
                   session: _session!,
-                  style: TextStyle(
-                    color: cs.onSurface,
+                  style: const TextStyle(
+                    color: Color(0xFF1A1A1A),
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    fontFeatures: const [FontFeature.tabularFigures()],
+                    fontWeight: FontWeight.w700,
+                    fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
@@ -1065,15 +1062,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget? _peerStateBar(ColorScheme cs) {
+  Widget? _peerStateBar() {
     final l10n = AppLocalizations.of(context)!;
     final session = _session;
     if (session == null) return null;
     final pills = <Widget>[
       if (session.peerMuted)
-        _statePill(cs, Symbols.mic_off, l10n.callPeerMicOff),
+        _statePill(Symbols.mic_off, l10n.callPeerMicOff),
       if (session.peerVideo)
-        _statePill(cs, Symbols.videocam, l10n.callPeerCameraOn),
+        _statePill(Symbols.videocam, l10n.callPeerCameraOn),
     ];
     if (pills.isEmpty) return null;
     return Wrap(
@@ -1084,23 +1081,25 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _statePill(ColorScheme cs, IconData icon, String label) {
-    return GlossyPill(
-      color: cs.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(100),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      depth: 5,
+  Widget _statePill(IconData icon, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F4F7),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: const Color(0xFFE2E5EB), width: 1),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: cs.onSurfaceVariant, fill: 1),
+          Icon(icon, size: 16, color: const Color(0xFF616161), fill: 1),
           const SizedBox(width: 6),
           Text(
             label,
-            style: TextStyle(
-              color: cs.onSurfaceVariant,
+            style: const TextStyle(
+              color: Color(0xFF424242),
               fontSize: 13,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -1108,23 +1107,22 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildAvatar(ColorScheme cs) {
+  Widget _buildAvatar() {
     final avatarSize = (MediaQuery.of(context).size.shortestSide * 0.42).clamp(
       128.0,
       172.0,
     );
-    return _avatarCircle(avatarSize, cs);
+    return _avatarCircle(avatarSize);
   }
 
   String get _displayName =>
       _name.isEmpty ? AppLocalizations.of(context)!.callUnknownName : _name;
 
-  Widget _avatarCircle(double size, ColorScheme cs) =>
-      _circleAvatar(size, cs, name: _displayName, url: _avatarUrl);
+  Widget _avatarCircle(double size) =>
+      _circleAvatar(size, name: _displayName, url: _avatarUrl);
 
   Widget _circleAvatar(
-    double size,
-    ColorScheme cs, {
+    double size, {
     required String name,
     String? url,
   }) {
@@ -1134,14 +1132,14 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: cs.surfaceContainerHighest,
+        color: const Color(0xFFF0F4F8),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.10),
-          width: 1.5,
+          color: const Color(0xFF1E88E5).withValues(alpha: 0.35),
+          width: 3.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -1153,30 +1151,30 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               fit: BoxFit.cover,
               memCacheWidth: 420,
               memCacheHeight: 420,
-              errorWidget: (_, _, _) => _avatarFallback(size, cs, name),
+              errorWidget: (_, _, _) => _avatarFallback(size, name),
             )
-          : _avatarFallback(size, cs, name),
+          : _avatarFallback(size, name),
     );
   }
 
-  Widget _avatarFallback(double size, ColorScheme cs, String name) {
+  Widget _avatarFallback(double size, String name) {
     final letter = (name.isEmpty ? '?' : name[0]).toUpperCase();
     return Container(
-      color: cs.primaryContainer,
+      color: const Color(0xFFF0F4F8),
       alignment: Alignment.center,
       child: Text(
         letter,
         style: TextStyle(
-          color: cs.onPrimaryContainer,
-          fontSize: size * 0.38,
-          fontWeight: FontWeight.w600,
+          color: const Color(0xFF2C3E50),
+          fontSize: size * 0.40,
+          fontWeight: FontWeight.w700,
           fontFamily: displayFontOf(context),
         ),
       ),
     );
   }
 
-  Widget _buildName(ColorScheme cs) {
+  Widget _buildName() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Text(
@@ -1185,31 +1183,32 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: cs.onSurface,
+          color: const Color(0xFF1A1A1A),
           fontSize: 30,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           fontFamily: displayFontOf(context),
+          letterSpacing: -0.5,
           height: 1.1,
         ),
       ),
     );
   }
 
-  Widget _buildStatus(ColorScheme cs) {
+  Widget _buildStatus() {
     final l10n = AppLocalizations.of(context)!;
     if (!_incomingPending && _state == CallSessionState.active) {
       final session = _session;
       if (session == null) return const SizedBox.shrink();
       if (!session.mediaConnected) {
-        return _statusWithDots(cs, l10n.callStatusConnecting);
+        return _statusWithDots(l10n.callStatusConnecting);
       }
       return _ElapsedText(
         session: session,
-        style: TextStyle(
-          color: cs.onSurfaceVariant,
+        style: const TextStyle(
+          color: Color(0xFF757575),
           fontSize: 16,
-          fontWeight: FontWeight.w500,
-          fontFeatures: const [FontFeature.tabularFigures()],
+          fontWeight: FontWeight.w600,
+          fontFeatures: [FontFeature.tabularFigures()],
         ),
       );
     }
@@ -1217,7 +1216,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     if (_incomingPending) {
       return Text(
         l10n.callIncoming,
-        style: TextStyle(color: cs.onSurfaceVariant, fontSize: 16),
+        style: const TextStyle(
+          color: Color(0xFF757575),
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
       );
     }
 
@@ -1233,26 +1236,36 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         text = l10n.callStatusEnded;
     }
 
-    return _statusWithDots(cs, text);
+    return _statusWithDots(text);
   }
 
-  Widget _statusWithDots(ColorScheme cs, String text) {
+  Widget _statusWithDots(String text) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(text, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 16)),
+        Text(
+          text,
+          style: const TextStyle(
+            color: Color(0xFF757575),
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         const SizedBox(width: 4),
-        _CallingDots(animation: _dotsController, color: cs.onSurfaceVariant),
+        _CallingDots(
+          animation: _dotsController,
+          color: const Color(0xFF757575),
+        ),
       ],
     );
   }
 
-  Widget _buildControls(ColorScheme cs) {
-    if (_incomingPending) return _incomingControls(cs);
-    return _activeControls(cs);
+  Widget _buildControls() {
+    if (_incomingPending) return _incomingControls();
+    return _activeControls();
   }
 
-  Widget _incomingControls(ColorScheme cs) {
+  Widget _incomingControls() {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 56),
@@ -1278,20 +1291,24 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _activeControls(ColorScheme cs) {
+  Widget _activeControls() {
     final l10n = AppLocalizations.of(context)!;
     final video = _session?.localVideo == true;
     final screen = _session?.localScreen == true;
+    const defaultBg = Color(0xFFF3F4F7);
+    const activeBg = Color(0xFF2C3E50);
+    const defaultFg = Color(0xFF2C3E50);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _CallButton(
             icon: _isSpeaker ? Symbols.volume_up : Symbols.volume_down,
             label: l10n.callSpeaker,
-            background: _isSpeaker ? cs.primary : cs.surfaceContainerHighest,
-            foreground: _isSpeaker ? cs.onPrimary : cs.onSurface,
+            background: _isSpeaker ? activeBg : defaultBg,
+            foreground: _isSpeaker ? Colors.white : defaultFg,
             onTap: _toggleSpeaker,
           ),
           _CallButton(
@@ -1299,16 +1316,16 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             slashedIcon: Symbols.videocam_off,
             slashed: !video,
             label: l10n.callVideoLabel,
-            background: video ? cs.primary : cs.surfaceContainerHighest,
-            foreground: video ? cs.onPrimary : cs.onSurface,
+            background: video ? activeBg : defaultBg,
+            foreground: video ? Colors.white : defaultFg,
             busy: _videoBusy,
             onTap: _toggleVideo,
           ),
           _CallButton(
             icon: Symbols.screen_share,
             label: l10n.callScreenLabel,
-            background: screen ? cs.primary : cs.surfaceContainerHighest,
-            foreground: screen ? cs.onPrimary : cs.onSurface,
+            background: screen ? activeBg : defaultBg,
+            foreground: screen ? Colors.white : defaultFg,
             busy: _videoBusy,
             onTap: _toggleScreen,
           ),
@@ -1319,8 +1336,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             label: _isMuted
                 ? (CallNoMute.enabled ? l10n.callMicStillLive : l10n.callUnmute)
                 : l10n.callMute,
-            background: _isMuted ? cs.primary : cs.surfaceContainerHighest,
-            foreground: _isMuted ? cs.onPrimary : cs.onSurface,
+            background: _isMuted ? const Color(0xFFFFEBEE) : defaultBg,
+            foreground: _isMuted ? const Color(0xFFE53935) : defaultFg,
             onTap: _toggleMute,
             onLongPress: _showMicrophones,
           ),
@@ -1420,31 +1437,42 @@ class _CallButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: 62,
           height: 62,
-          child: GlossyPill(
+          child: Material(
             color: background,
             borderRadius: BorderRadius.circular(31),
-            onTap: busy ? null : onTap,
-            onLongPress: busy ? null : onLongPress,
-            depth: 9,
-            child: Center(
-              child: busy
-                  ? SmallSpinner(size: 22, color: foreground)
-                  : _buildIcon(),
+            elevation: 0,
+            child: InkWell(
+              onTap: busy ? null : onTap,
+              onLongPress: busy ? null : onLongPress,
+              borderRadius: BorderRadius.circular(31),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(31),
+                  border: Border.all(
+                    color: const Color(0xFFD6D9E0).withValues(alpha: 0.5),
+                    width: 1,
+                  ),
+                ),
+                child: Center(
+                  child: busy
+                      ? SmallSpinner(size: 22, color: foreground)
+                      : _buildIcon(),
+                ),
+              ),
             ),
           ),
         ),
         const SizedBox(height: 8),
         Text(
           label,
-          style: TextStyle(
-            color: cs.onSurfaceVariant,
+          style: const TextStyle(
+            color: Color(0xFF757575),
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -1506,7 +1534,6 @@ class _CallInfoSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
     final info = session?.info;
 
     final rows = <List<String>>[];
@@ -1565,38 +1592,42 @@ class _CallInfoSheet extends StatelessWidget {
     );
 
     final badges = <Widget>[
-      _badge(cs, Symbols.lock, l10n.callBadgeEncrypted),
-      _badge(cs, Symbols.call, l10n.callBadgeAudio),
+      _badge(Symbols.lock, l10n.callBadgeEncrypted),
+      _badge(Symbols.call, l10n.callBadgeAudio),
       if (info?.record == true)
-        _badge(cs, Symbols.radio_button_checked, l10n.callBadgeRecording),
+        _badge(Symbols.radio_button_checked, l10n.callBadgeRecording),
       if (info?.denoise == true)
-        _badge(cs, Symbols.noise_control_on, l10n.callBadgeNoiseSuppression),
+        _badge(Symbols.noise_control_on, l10n.callBadgeNoiseSuppression),
       if (info?.animoji == true)
-        _badge(cs, Symbols.mood, l10n.callBadgeAnimoji),
+        _badge(Symbols.mood, l10n.callBadgeAnimoji),
     ];
 
     return SafeArea(
       top: false,
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Center(
+                child: SheetGrabber(margin: EdgeInsets.only(bottom: 16)),
+              ),
               Text(
                 l10n.callInfoTitle,
                 style: TextStyle(
-                  color: cs.onSurface,
+                  color: const Color(0xFF1A1A1A),
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   fontFamily: displayFontOf(context),
+                  letterSpacing: -0.2,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 name,
-                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+                style: const TextStyle(color: Color(0xFF757575), fontSize: 14),
               ),
               const SizedBox(height: 16),
               Wrap(spacing: 8, runSpacing: 8, children: badges),
@@ -1604,7 +1635,7 @@ class _CallInfoSheet extends StatelessWidget {
               if (rows.isEmpty)
                 Text(
                   l10n.callInfoNoDataYet,
-                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+                  style: const TextStyle(color: Color(0xFF757575), fontSize: 14),
                 ),
               for (final r in rows)
                 Padding(
@@ -1616,8 +1647,8 @@ class _CallInfoSheet extends StatelessWidget {
                         width: 150,
                         child: Text(
                           r[0],
-                          style: TextStyle(
-                            color: cs.onSurfaceVariant,
+                          style: const TextStyle(
+                            color: Color(0xFF757575),
                             fontSize: 13,
                           ),
                         ),
@@ -1626,10 +1657,10 @@ class _CallInfoSheet extends StatelessWidget {
                       Expanded(
                         child: SelectableText(
                           r[1],
-                          style: TextStyle(
-                            color: cs.onSurface,
+                          style: const TextStyle(
+                            color: Color(0xFF1A1A1A),
                             fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -1652,24 +1683,25 @@ class _CallInfoSheet extends StatelessWidget {
 
   String _shortFp(String fp) => fp.length > 34 ? '${fp.substring(0, 34)}…' : fp;
 
-  Widget _badge(ColorScheme cs, IconData icon, String label) {
+  Widget _badge(IconData icon, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
+        color: const Color(0xFFF3F4F7),
         borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: const Color(0xFFE2E5EB), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 15, color: cs.onSurfaceVariant, fill: 1),
+          Icon(icon, size: 15, color: const Color(0xFF616161), fill: 1),
           const SizedBox(width: 6),
           Text(
             label,
-            style: TextStyle(
-              color: cs.onSurface,
+            style: const TextStyle(
+              color: Color(0xFF1A1A1A),
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
