@@ -90,10 +90,6 @@ class _WebAppScreenState extends State<WebAppScreen> {
       _bridge = null;
     });
     try {
-      // Тот же UA, что уходит в sessionInit (из handshake-устройства ядра),
-      // чтобы веб-аппы видели нативный клиент; фолбэк — браузерный UA спуфа.
-      // Для веб-аппов с внешней авторизацией (Госуслуги/ЕСИА) клиентский UA
-      // ядра отбраковывается антифродом — там нужен UA настоящего WebView.
       _userAgent = '';
       if (widget.preferSystemUserAgent) {
         try {
@@ -193,7 +189,10 @@ class _WebAppScreenState extends State<WebAppScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    const textColor = Color(0xFF1A1A1A);
+    const borderColor = Color(0xFFE2E5EB);
+    const accentColor = Color(0xFF1E88E5);
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -202,40 +201,60 @@ class _WebAppScreenState extends State<WebAppScreen> {
         if (await _handleBack()) navigator.pop();
       },
       child: Scaffold(
-        backgroundColor: cs.surface,
+        backgroundColor: Colors.white,
         floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
         floatingActionButton: const ConnectionSpinner(),
         appBar: AppBar(
-          backgroundColor: cs.surface,
+          backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          title: Text(widget.title),
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          centerTitle: true,
+          title: Text(
+            widget.title,
+            style: const TextStyle(
+              color: textColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
+            ),
+          ),
           leading: IconButton(
-            icon: const Icon(Symbols.close),
+            icon: const Icon(Symbols.close, color: textColor, size: 22),
             onPressed: () => Navigator.of(context).maybePop(),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Symbols.refresh),
+              icon: const Icon(Symbols.refresh, color: textColor, size: 22),
               onPressed: _launch == null ? null : () => _controller?.reload(),
             ),
           ],
-          bottom: _progress > 0 && _progress < 1
-              ? PreferredSize(
-                  preferredSize: const Size.fromHeight(2),
-                  child: LinearProgressIndicator(
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Stack(
+              children: [
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: borderColor,
+                ),
+                if (_progress > 0 && _progress < 1)
+                  LinearProgressIndicator(
                     value: _progress,
                     minHeight: 2,
                     backgroundColor: Colors.transparent,
+                    valueColor: const AlwaysStoppedAnimation<Color>(accentColor),
                   ),
-                )
-              : null,
+              ],
+            ),
+          ),
         ),
-        body: _buildBody(cs),
+        body: _buildBody(),
       ),
     );
   }
 
-  Widget _buildBody(ColorScheme cs) {
+  Widget _buildBody() {
     if (_loadError != null) {
       return ErrorView(message: _loadError!, onRetry: _load);
     }
