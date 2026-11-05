@@ -9,7 +9,7 @@ class ScreenWake {
 
   static final ScreenWake instance = ScreenWake._();
 
-  static const _channel = MethodChannel('ru.komet.app/screen');
+  static const _channel = MethodChannel('mishagin.flux.com/screen');
 
   final Set<Object> _holders = <Object>{};
 

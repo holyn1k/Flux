@@ -88,7 +88,7 @@ class DeepLinkService {
   }
 
   void _flushPending() {
-    final context = KometApp.navigatorKey.currentContext;
+    final context = FluxApp.navigatorKey.currentContext;
 
     if (_pendingLogExport) {
       if (context == null) {
@@ -162,7 +162,7 @@ class DeepLinkService {
 
   WebPushSubscription? _parseWebPushLink(Uri uri) {
     if (!Platform.isIOS) return null;
-    if (uri.scheme.toLowerCase() != 'komet') return null;
+    if (uri.scheme.toLowerCase() != 'flux') return null;
 
     final segments = <String>[
       if (uri.host.isNotEmpty) uri.host,
@@ -216,15 +216,15 @@ class DeepLinkService {
     final scheme = uri.scheme.toLowerCase();
     final host = uri.host.toLowerCase();
     final segments = <String>[
-      if (scheme == 'komet' && host.isNotEmpty) host,
+      if (scheme == 'flux' && host.isNotEmpty) host,
       ...uri.pathSegments,
     ].where((s) => s.isNotEmpty).toList();
 
-    if (scheme == 'komet') {
+    if (scheme == 'flux') {
       return segments.length == 1 && segments.first == 'export-logs';
     }
     if (scheme == 'https' || scheme == 'http') {
-      return (host == 'komet.pw' || host == 'www.komet.pw') &&
+      return (host == 'flux.pw' || host == 'www.flux.pw') &&
           segments.length == 1 &&
           segments.first == 'export-logs';
     }
@@ -240,7 +240,7 @@ class DeepLinkService {
       return null;
     }
 
-    if (scheme == 'komet' || scheme == 'max') {
+    if (scheme == 'flux' || scheme == 'max') {
       final segments = <String>[
         if (uri.host.isNotEmpty && uri.host.toLowerCase() != 'max.ru') uri.host,
         ...uri.pathSegments,

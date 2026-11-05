@@ -6,7 +6,7 @@ import 'spectrum_tint.dart';
 
 /// Circular avatar: shows [imageUrl] when available, otherwise the first letter
 /// of [name] on a colored background. Falls back to the letter on image error.
-class KometAvatar extends StatefulWidget {
+class FluxAvatar extends StatefulWidget {
   final String name;
   final String? imageUrl;
   final double size;
@@ -15,7 +15,7 @@ class KometAvatar extends StatefulWidget {
   final double? fontSize;
   final bool fadeIn;
 
-  const KometAvatar({
+  const FluxAvatar({
     super.key,
     required this.name,
     required this.size,
@@ -30,10 +30,10 @@ class KometAvatar extends StatefulWidget {
   static const _fadeOutDuration = Duration(milliseconds: 1000);
 
   @override
-  State<KometAvatar> createState() => _KometAvatarState();
+  State<FluxAvatar> createState() => _FluxAvatarState();
 }
 
-class _KometAvatarState extends State<KometAvatar>
+class _FluxAvatarState extends State<FluxAvatar>
     implements SpectrumTintSource {
   Color _background = const Color(0xFF000000);
   bool _registered = false;
@@ -106,10 +106,10 @@ class _KometAvatarState extends State<KometAvatar>
               memCacheWidth: cache,
               memCacheHeight: cache,
               fadeInDuration: widget.fadeIn
-                  ? KometAvatar._fadeInDuration
+                  ? FluxAvatar._fadeInDuration
                   : Duration.zero,
               fadeOutDuration: widget.fadeIn
-                  ? KometAvatar._fadeOutDuration
+                  ? FluxAvatar._fadeOutDuration
                   : Duration.zero,
               errorWidget: (_, _, _) => placeholder,
             )

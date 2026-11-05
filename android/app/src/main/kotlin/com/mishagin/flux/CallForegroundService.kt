@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.app.Service
 import android.content.Context
@@ -20,9 +20,9 @@ object CallState {
 class CallForegroundService : Service() {
 
     companion object {
-        const val ACTION_START = "ru.komet.app.CALL_ONGOING_START"
-        const val ACTION_STOP = "ru.komet.app.CALL_ONGOING_STOP"
-        const val ACTION_SCREEN_SHARE = "ru.komet.app.CALL_SCREEN_SHARE"
+        const val ACTION_START = "mishagin.flux.com.CALL_ONGOING_START"
+        const val ACTION_STOP = "mishagin.flux.com.CALL_ONGOING_STOP"
+        const val ACTION_SCREEN_SHARE = "mishagin.flux.com.CALL_SCREEN_SHARE"
         const val EXTRA_SCREEN_SHARE = "screenShare"
         const val ONGOING_ID = 424243
 
@@ -46,7 +46,7 @@ class CallForegroundService : Service() {
                     ctx.startService(intent)
                 }
             } catch (e: Exception) {
-                Log.w("KometFcm", "screen share FGS update failed: ${e.message}")
+                Log.w("FluxFcm", "screen share FGS update failed: ${e.message}")
             }
         }
 
@@ -63,7 +63,7 @@ class CallForegroundService : Service() {
                     ctx.startService(intent)
                 }
             } catch (e: Exception) {
-                Log.w("KometFcm", "ongoing FGS start failed: ${e.message}")
+                Log.w("FluxFcm", "ongoing FGS start failed: ${e.message}")
             }
         }
 
@@ -160,7 +160,7 @@ class CallForegroundService : Service() {
                 startForeground(ONGOING_ID, notif)
             }
         } catch (e: Exception) {
-            Log.w("KometFcm", "startForeground failed: ${e.message}")
+            Log.w("FluxFcm", "startForeground failed: ${e.message}")
             stopSelf()
         }
     }

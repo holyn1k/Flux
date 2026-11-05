@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -26,29 +26,29 @@ import com.google.firebase.messaging.RemoteMessage
 import org.json.JSONArray
 import org.json.JSONObject
 
-class KometFcmService : FirebaseMessagingService() {
+class FluxFcmService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         val data = message.data
-        Log.d("KometFcm", "onMessageReceived type=${data["type"]} keys=${data.keys}")
+        Log.d("FluxFcm", "onMessageReceived type=${data["type"]} keys=${data.keys}")
         if (data.isEmpty()) return
         val type = data["type"]
         FkmState.restore(applicationContext)
         if (FkmState.enabled && type != "InboundCall" && type != "CallFinished") {
-            Log.d("KometFcm", "message push dropped: FKM handles messages")
+            Log.d("FluxFcm", "message push dropped: FKM handles messages")
             return
         }
-        KometNotifier(applicationContext).handle(data)
+        FluxNotifier(applicationContext).handle(data)
     }
 }
 
-class KometNotifier(private val ctx: Context) {
+class FluxNotifier(private val ctx: Context) {
 
     companion object {
-        private const val CHANNEL_ID = "komet_messages"
+        private const val CHANNEL_ID = "flux_messages"
         private const val CHANNEL_NAME = "Сообщения"
-        private const val GROUP_KEY = "komet_messages_group"
+        private const val GROUP_KEY = "flux_messages_group"
         private const val SUMMARY_ID = 424200
-        private const val PREFS = "komet_push"
+        private const val PREFS = "flux_push"
         private const val FLN_RECEIVER =
             "com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
         private const val FLN_ACTION_TAPPED =
@@ -336,7 +336,7 @@ class KometNotifier(private val ctx: Context) {
             .setShowWhen(true)
             .setNumber(entries.size)
             .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN)
-            .setContentTitle("Komet")
+            .setContentTitle("Flux")
             .setContentText(boldLine(newest.first, newest.second))
             .setStyle(inbox)
             .build()
@@ -399,7 +399,7 @@ class KometNotifier(private val ctx: Context) {
                 .build()
             ShortcutManagerCompat.pushDynamicShortcut(ctx, shortcut)
         } catch (e: Exception) {
-            Log.w("KometFcm", "shortcut push failed: $e")
+            Log.w("FluxFcm", "shortcut push failed: $e")
         }
     }
 

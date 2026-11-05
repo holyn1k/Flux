@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komet/core/config/app_icon.dart';
+import 'package:flux/core/config/app_icon.dart';
 
 Set<String> _iosAlternateIcons() {
   final plist = File('ios/Runner/Info.plist').readAsStringSync();
@@ -38,13 +38,13 @@ Set<String> _androidComponents() {
     'android/app/src/main/AndroidManifest.xml',
   ).readAsStringSync();
   return RegExp(
-    r'android:name="ru\.komet\.app\.(\w+)"',
+    r'android:name="ru\.flux\.app\.(\w+)"',
   ).allMatches(manifest).map((m) => m.group(1)!).toSet();
 }
 
 Set<String> _androidIconKeys() {
   final source = File(
-    'android/app/src/main/kotlin/ru/komet/app/MainActivity.kt',
+    'android/app/src/main/kotlin/ru/flux/app/MainActivity.kt',
   ).readAsStringSync();
   final start = source.indexOf('iconComponents = mapOf(');
   expect(start, isNonNegative, reason: 'в MainActivity нет карты иконок');

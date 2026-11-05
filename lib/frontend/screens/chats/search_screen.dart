@@ -10,7 +10,7 @@ import '../../../backend/modules/messages.dart' show ContactCache;
 import '../../../core/storage/app_database.dart';
 import '../../../core/utils/debouncer.dart';
 import '../../../core/utils/names.dart';
-import '../../widgets/komet_avatar.dart';
+import '../../widgets/flux_avatar.dart';
 import '../../widgets/small_spinner.dart';
 import '../../widgets/swipe_route.dart';
 import '../contacts/open_contact_profile.dart';
@@ -402,7 +402,7 @@ class _ResultTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         child: Row(
           children: [
-            KometAvatar(name: name, size: 48, imageUrl: imageUrl),
+            FluxAvatar(name: name, size: 48, imageUrl: imageUrl),
             const SizedBox(width: 14),
             Expanded(
               child: Column(

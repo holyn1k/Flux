@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.Manifest
 import android.app.KeyguardManager
@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : FlutterActivity() {
 
-    private val channelName = "ru.komet.app/vpn_bypass"
+    private val channelName = "mishagin.flux.com/vpn_bypass"
     private val iconPackage = MainActivity::class.java.name.substringBeforeLast('.')
     private val iconComponents = mapOf(
         "MainActivity" to "$iconPackage.MainActivity",
@@ -89,7 +89,7 @@ class MainActivity : FlutterActivity() {
         const val LOG_TAG = "VpnBypass"
         const val SHARE_TAG = "ShareIntake"
         const val NFC_TAG = "NfcExchange"
-        const val KEEP_ENGINE_ID = "komet_keep_engine"
+        const val KEEP_ENGINE_ID = "flux_keep_engine"
         const val NFC_PHASE_MIN_MS = 350L
         const val NFC_PHASE_JITTER_MS = 400
         const val BLE_PERMS_REQUEST = 7711
@@ -126,7 +126,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/nfc",
+            "mishagin.flux.com/nfc",
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "status" -> result.success(nfcStatus())
@@ -150,7 +150,7 @@ class MainActivity : FlutterActivity() {
 
         EventChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/nfc_events",
+            "mishagin.flux.com/nfc_events",
         ).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                 nfcEvents = events
@@ -175,7 +175,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/app_icon",
+            "mishagin.flux.com/app_icon",
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "setAppIcon" -> {
@@ -197,7 +197,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/upload_service",
+            "mishagin.flux.com/upload_service",
         ).setMethodCallHandler { call, result ->
             val ctx = this
             fun uploadIntent(call: MethodCall, action: String) =
@@ -248,7 +248,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/video_note",
+            "mishagin.flux.com/video_note",
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "permission" -> requestNotePermissions(result)
@@ -287,7 +287,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/video",
+            "mishagin.flux.com/video",
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "cropSquare" -> {
@@ -332,7 +332,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/calls",
+            "mishagin.flux.com/calls",
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "consumeInitialCall" -> {
@@ -393,7 +393,7 @@ class MainActivity : FlutterActivity() {
                                 ),
                             )
                         } catch (e: Exception) {
-                            Log.w("KometFcm", "open FSI settings failed: ${e.message}")
+                            Log.w("FluxFcm", "open FSI settings failed: ${e.message}")
                         }
                     }
                     result.success(null)
@@ -404,7 +404,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/screen",
+            "mishagin.flux.com/screen",
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "setKeepAwake" -> {
@@ -417,7 +417,7 @@ class MainActivity : FlutterActivity() {
 
         EventChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/calls_events",
+            "mishagin.flux.com/calls_events",
         ).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                 CallEvents.sink = events
@@ -430,7 +430,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/notifications",
+            "mishagin.flux.com/notifications",
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "consumeInitialChat" -> {
@@ -453,7 +453,7 @@ class MainActivity : FlutterActivity() {
 
         EventChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/notification_events",
+            "mishagin.flux.com/notification_events",
         ).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                 ChatNotifications.sink = events
@@ -466,7 +466,7 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/share",
+            "mishagin.flux.com/share",
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "consumeInitialShare" -> {
@@ -501,7 +501,7 @@ class MainActivity : FlutterActivity() {
 
         EventChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "ru.komet.app/share_events",
+            "mishagin.flux.com/share_events",
         ).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                 ShareIntake.sink = events
@@ -965,7 +965,7 @@ class MainActivity : FlutterActivity() {
     override fun onDestroy() {
         shareExecutor.shutdown()
         if (keepEngineAlive() && isFinishing) {
-            Log.d("KometFcm", "task removed, caching engine (call=${CallState.inCall} fkm=${FkmState.enabled})")
+            Log.d("FluxFcm", "task removed, caching engine (call=${CallState.inCall} fkm=${FkmState.enabled})")
             flutterEngine?.let { FlutterEngineCache.getInstance().put(KEEP_ENGINE_ID, it) }
         }
         super.onDestroy()

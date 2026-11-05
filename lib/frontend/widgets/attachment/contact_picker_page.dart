@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'package:komet/backend/modules/contacts.dart';
-import 'package:komet/core/config/debug_test.dart';
-import 'package:komet/core/contacts/device_contacts_service.dart';
-import 'package:komet/core/storage/app_database.dart';
-import 'package:komet/frontend/widgets/komet_avatar.dart';
-import 'package:komet/frontend/widgets/small_spinner.dart';
-import 'package:komet/frontend/widgets/springy_tap.dart';
-import 'package:komet/l10n/app_localizations.dart';
+import 'package:flux/backend/modules/contacts.dart';
+import 'package:flux/core/config/debug_test.dart';
+import 'package:flux/core/contacts/device_contacts_service.dart';
+import 'package:flux/core/storage/app_database.dart';
+import 'package:flux/frontend/widgets/flux_avatar.dart';
+import 'package:flux/frontend/widgets/small_spinner.dart';
+import 'package:flux/frontend/widgets/springy_tap.dart';
+import 'package:flux/l10n/app_localizations.dart';
 
 class ContactPickerPage extends StatefulWidget {
   final double bottomReserve;
@@ -178,7 +178,7 @@ class _ContactPickerPageState extends State<ContactPickerPage> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: [
-                KometAvatar(name: name, imageUrl: contact.baseUrl, size: 44),
+                FluxAvatar(name: name, imageUrl: contact.baseUrl, size: 44),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(

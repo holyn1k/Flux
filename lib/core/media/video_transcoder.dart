@@ -66,7 +66,7 @@ class VideoExportSpec {
 }
 
 class VideoTranscoder {
-  static const _channel = MethodChannel('ru.komet.app/video');
+  static const _channel = MethodChannel('mishagin.flux.com/video');
 
   static bool get _native => Platform.isAndroid || Platform.isIOS;
 
@@ -143,7 +143,7 @@ class VideoTranscoder {
     return File(
       p.join(
         dir.path,
-        'komet_${prefix}_${DateTime.now().microsecondsSinceEpoch}.mp4',
+        'flux_${prefix}_${DateTime.now().microsecondsSinceEpoch}.mp4',
       ),
     );
   }
@@ -356,7 +356,7 @@ class VideoTranscoder {
     final file = File(
       p.join(
         dir.path,
-        'komet_lut_${DateTime.now().microsecondsSinceEpoch}.cube',
+        'flux_lut_${DateTime.now().microsecondsSinceEpoch}.cube',
       ),
     );
     await file.writeAsString(buffer.toString());

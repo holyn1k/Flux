@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../main.dart' show KometApp;
+import '../../main.dart' show FluxApp;
 
 enum UploadKind { photo, video, videoNote, voice, file }
 
@@ -53,7 +53,7 @@ class _NotificationJob {
 
 class UploadNotificationService {
   static const MethodChannel _channel = MethodChannel(
-    'ru.komet.app/upload_service',
+    'mishagin.flux.com/upload_service',
   );
   static const int _minIntervalMs = 350;
   static const Duration _startDelay = Duration(milliseconds: 700);
@@ -189,7 +189,7 @@ class UploadNotificationService {
   }
 
   static AppLocalizations _localizations() {
-    final context = KometApp.navigatorKey.currentContext;
+    final context = FluxApp.navigatorKey.currentContext;
     if (context != null) {
       final scoped = Localizations.of<AppLocalizations>(
         context,

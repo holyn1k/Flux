@@ -29,7 +29,7 @@ class PulseRouteException implements Exception {
 class PulseAudio {
   PulseAudio._();
 
-  static const String bridgePrefix = 'komet_capture_';
+  static const String bridgePrefix = 'flux_capture_';
 
   static String? _bridgeModule;
   static String? _bridgeMaster;

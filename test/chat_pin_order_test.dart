@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komet/backend/modules/chat_parsing.dart';
-import 'package:komet/backend/modules/chats.dart';
+import 'package:flux/backend/modules/chat_parsing.dart';
+import 'package:flux/backend/modules/chats.dart';
 
 const int _me = 4242;
 const int _chatId = -1000000000001;

@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.app.*
 import android.content.Intent
@@ -11,11 +11,11 @@ import androidx.core.app.NotificationCompat
 class UploadForegroundService : Service() {
 
     companion object {
-        const val CHANNEL_ID = "komet_upload"
+        const val CHANNEL_ID = "flux_upload"
         const val NOTIFICATION_ID = 9001
-        const val ACTION_START  = "ru.komet.app.UPLOAD_START"
-        const val ACTION_UPDATE = "ru.komet.app.UPLOAD_UPDATE"
-        const val ACTION_STOP   = "ru.komet.app.UPLOAD_STOP"
+        const val ACTION_START  = "mishagin.flux.com.UPLOAD_START"
+        const val ACTION_UPDATE = "mishagin.flux.com.UPLOAD_UPDATE"
+        const val ACTION_STOP   = "mishagin.flux.com.UPLOAD_STOP"
         const val EXTRA_TITLE = "title"
         const val EXTRA_BODY = "body"
         const val EXTRA_PROGRESS = "progress"

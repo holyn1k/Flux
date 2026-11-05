@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komet/frontend/widgets/attachment/bubbles/video_note_bubble.dart';
+import 'package:flux/frontend/widgets/attachment/bubbles/video_note_bubble.dart';
 
 const _extent = 210.0;
 const _knob = 7.0;

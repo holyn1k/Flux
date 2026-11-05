@@ -133,7 +133,7 @@ class CallSession {
   static const int _speakHoldTicks = 3;
 
   RTCDataChannel? _probeChannel;
-  bool _peerIsKomet = false;
+  bool _peerIsFlux = false;
 
   final List<RTCDataChannel> _sfuChannels = [];
   SfuCommandChannel? _sfuCommands;
@@ -155,9 +155,9 @@ class CallSession {
     'producerNotification',
   ];
 
-  static const bool _kometProbeEnabled = false;
-  static const String _probeQuestion = 'AreYouKomet?';
-  static const String _probeAnswer = 'YesImKomet😎';
+  static const bool _fluxProbeEnabled = false;
+  static const String _probeQuestion = 'AreYouFlux?';
+  static const String _probeAnswer = 'YesImFlux😎';
 
   final List<CallChatMessage> _chat = [];
   final _chatController = StreamController<CallChatMessage>.broadcast();
@@ -206,7 +206,7 @@ class CallSession {
   final _state = StreamController<CallSessionState>.broadcast();
   final _remoteStream = StreamController<MediaStream>.broadcast();
   final _info = StreamController<void>.broadcast();
-  final _kometDetected = StreamController<void>.broadcast();
+  final _fluxDetected = StreamController<void>.broadcast();
 
   Stream<CallSessionState> get stateStream => _state.stream;
   Stream<MediaStream> get remoteStreamStream => _remoteStream.stream;
@@ -214,8 +214,8 @@ class CallSession {
 
   Stream<void> get infoUpdates => _info.stream;
 
-  Stream<void> get peerKometDetected => _kometDetected.stream;
-  bool get peerIsKomet => _peerIsKomet;
+  Stream<void> get peerFluxDetected => _fluxDetected.stream;
+  bool get peerIsFlux => _peerIsFlux;
 
   bool get isMuted => _muted;
   bool get audioTransmitting => !_muted || CallNoMute.enabled;
@@ -814,7 +814,7 @@ class CallSession {
       init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
     );
 
-    await _setupKometProbe(pc);
+    await _setupFluxProbe(pc);
 
     if (_isDesktop) await _preferVp8Codecs(pc);
 
@@ -846,7 +846,7 @@ class CallSession {
     };
     pc.onTrack = (event) => unawaited(_onRemoteTrack(event));
     pc.onDataChannel = (channel) {
-      if (!_kometProbeEnabled) return;
+      if (!_fluxProbeEnabled) return;
       _bindProbeChannel(channel, ask: false);
     };
     pc.onIceConnectionState = (s) {
@@ -1252,11 +1252,11 @@ class CallSession {
     }
   }
 
-  Future<void> _setupKometProbe(RTCPeerConnection pc) async {
-    if (!_kometProbeEnabled || _topology == 'SERVER') return;
+  Future<void> _setupFluxProbe(RTCPeerConnection pc) async {
+    if (!_fluxProbeEnabled || _topology == 'SERVER') return;
     try {
       final channel = await pc.createDataChannel(
-        'komet',
+        'flux',
         RTCDataChannelInit()..ordered = true,
       );
       _probeChannel = channel;
@@ -1296,7 +1296,7 @@ class CallSession {
     if (text == _probeQuestion) {
       _sendProbe(channel, _probeAnswer);
     } else if (text == _probeAnswer) {
-      _markPeerKomet();
+      _markPeerFlux();
     }
   }
 
@@ -1342,11 +1342,11 @@ class CallSession {
     if (!_chatController.isClosed) _chatController.add(message);
   }
 
-  void _markPeerKomet() {
-    if (_peerIsKomet) return;
-    _peerIsKomet = true;
-    logger.t('[call] peer is Komet');
-    if (!_kometDetected.isClosed) _kometDetected.add(null);
+  void _markPeerFlux() {
+    if (_peerIsFlux) return;
+    _peerIsFlux = true;
+    logger.t('[call] peer is Flux');
+    if (!_fluxDetected.isClosed) _fluxDetected.add(null);
     _notifyInfo();
   }
 
@@ -1860,7 +1860,7 @@ class CallSession {
     if (id == null || id == ws2Config.userId) return;
     var stream = _participantStreams[id];
     if (stream == null) {
-      stream = await createLocalMediaStream('komet_p$id');
+      stream = await createLocalMediaStream('flux_p$id');
       _participantStreams[id] = stream;
     }
     if (stream.getTracks().any((t) => t.id == track.id)) return;
@@ -1876,7 +1876,7 @@ class CallSession {
   Future<void> _pushRemoteTrack(MediaStreamTrack track) async {
     var stream = _remoteStreamRef;
     if (stream == null) {
-      stream = await createLocalMediaStream('komet_remote');
+      stream = await createLocalMediaStream('flux_remote');
       _ownRemoteStream = true;
     }
     _remoteStreamRef = stream;
@@ -2349,7 +2349,7 @@ class CallSession {
     if (!_state.isClosed) await _state.close();
     if (!_remoteStream.isClosed) await _remoteStream.close();
     if (!_info.isClosed) await _info.close();
-    if (!_kometDetected.isClosed) await _kometDetected.close();
+    if (!_fluxDetected.isClosed) await _fluxDetected.close();
     if (!_chatController.isClosed) await _chatController.close();
     if (!_gameController.isClosed) await _gameController.close();
   }

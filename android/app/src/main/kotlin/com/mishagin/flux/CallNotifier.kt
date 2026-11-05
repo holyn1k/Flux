@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -46,21 +46,21 @@ object CallEvents {
 }
 
 object CallConst {
-    const val CHANNEL_ID = "komet_calls"
+    const val CHANNEL_ID = "flux_calls"
     const val CHANNEL_NAME = "Звонки"
     const val NOTIF_ID = 424242
     const val ACCENT = 0xFF7C6BF0.toInt()
 
-    const val EXTRA_CALL = "komet_call"
-    const val EXTRA_ACTION = "komet_call_action"
-    const val EXTRA_DECLINE_PAYLOAD = "komet_decline_payload"
-    const val EXTRA_NOTIF_ID = "komet_notif_id"
-    const val EXTRA_CALLER = "komet_caller"
+    const val EXTRA_CALL = "flux_call"
+    const val EXTRA_ACTION = "flux_call_action"
+    const val EXTRA_DECLINE_PAYLOAD = "flux_decline_payload"
+    const val EXTRA_NOTIF_ID = "flux_notif_id"
+    const val EXTRA_CALLER = "flux_caller"
 
     const val ACTION_RING = "ring"
     const val ACTION_ANSWER = "answer"
-    const val ACTION_DECLINE = "ru.komet.app.CALL_DECLINE"
-    const val ACTION_HANGUP = "ru.komet.app.CALL_HANGUP"
+    const val ACTION_DECLINE = "mishagin.flux.com.CALL_DECLINE"
+    const val ACTION_HANGUP = "mishagin.flux.com.CALL_HANGUP"
 
     const val FLN_RECEIVER =
         "com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
@@ -72,7 +72,7 @@ object CallNotifier {
 
     fun showIncoming(ctx: Context, data: Map<String, String>) {
         if (AppState.resumed) {
-            Log.d("KometFcm", "call push suppressed (app foreground)")
+            Log.d("FluxFcm", "call push suppressed (app foreground)")
             return
         }
         val name = data["userName"] ?: data["title"] ?: "Неизвестный"
@@ -82,7 +82,7 @@ object CallNotifier {
         val account = data["c"] ?: ""
         val callJson = JSONObject(data as Map<*, *>).toString()
 
-        Log.d("KometFcm", "showIncoming caller=$callerId conv=$conversationId keys=${data.keys}")
+        Log.d("FluxFcm", "showIncoming caller=$callerId conv=$conversationId keys=${data.keys}")
 
         ensureChannel(ctx)
 
@@ -117,7 +117,7 @@ object CallNotifier {
     }
 
     fun finishCall(ctx: Context, data: Map<String, String>) {
-        Log.d("KometFcm", "finishCall keys=${data.keys}")
+        Log.d("FluxFcm", "finishCall keys=${data.keys}")
         CallRinger.stop()
         NotificationManagerCompat.from(ctx).cancel(CallConst.NOTIF_ID)
         CallEvents.emit("ended")
@@ -208,7 +208,7 @@ object CallRinger {
         activeConversationId = conversationId
 
         val power = ctx.getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = power.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "komet:call").apply {
+        wakeLock = power.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "flux:call").apply {
             setReferenceCounted(false)
             acquire(60_000L)
         }
@@ -271,7 +271,7 @@ object CallRinger {
             rt.play()
             ringtone = rt
         } catch (e: Exception) {
-            Log.w("KometFcm", "ringtone failed: ${e.message}")
+            Log.w("FluxFcm", "ringtone failed: ${e.message}")
         }
     }
 
@@ -288,7 +288,7 @@ object CallRinger {
             }
             vibrator = vib
         } catch (e: Exception) {
-            Log.w("KometFcm", "vibrate failed: ${e.message}")
+            Log.w("FluxFcm", "vibrate failed: ${e.message}")
         }
     }
 }
@@ -315,7 +315,7 @@ class CallActionReceiver : BroadcastReceiver() {
         try {
             ctx.sendBroadcast(fln)
         } catch (e: Exception) {
-            Log.w("KometFcm", "decline broadcast failed: ${e.message}")
+            Log.w("FluxFcm", "decline broadcast failed: ${e.message}")
         }
     }
 }

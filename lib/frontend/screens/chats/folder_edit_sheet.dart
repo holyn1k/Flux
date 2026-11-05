@@ -13,7 +13,7 @@ import '../../../core/utils/haptics.dart';
 import '../../../main.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/custom_notification.dart';
-import '../../widgets/komet_avatar.dart';
+import '../../widgets/flux_avatar.dart';
 import '../../widgets/sheet_helpers.dart';
 import '../../widgets/small_spinner.dart';
 
@@ -435,7 +435,7 @@ class _FolderEditSheetState extends State<_FolderEditSheet> {
             for (final chat in visibleChats)
               _buildRow(
                 cs,
-                leading: KometAvatar(
+                leading: FluxAvatar(
                   name: _chatTitle(chat),
                   size: 40,
                   imageUrl: _chatAvatar(chat),

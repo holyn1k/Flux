@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komet/core/share/share_labels.dart';
-import 'package:komet/models/shared_payload.dart';
+import 'package:flux/core/share/share_labels.dart';
+import 'package:flux/models/shared_payload.dart';
 
 late Directory _dir;
 
@@ -67,11 +67,11 @@ void main() {
     test('a text-only share survives with no files', () {
       final payload = SharedPayload.fromMap({
         'files': const [],
-        'text': '  https://komet.pw  ',
+        'text': '  https://flux.pw  ',
       });
 
       expect(payload!.isTextOnly, isTrue);
-      expect(payload.text, 'https://komet.pw');
+      expect(payload.text, 'https://flux.pw');
     });
 
     test('an empty share is rejected', () {

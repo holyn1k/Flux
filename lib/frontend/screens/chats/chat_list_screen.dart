@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:komet/backend/modules/messages.dart';
+import 'package:flux/backend/modules/messages.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -61,7 +61,7 @@ import '../../../core/cache/info_cache.dart';
 import '../../../core/config/app_visual_style.dart';
 import '../../../core/config/app_stories.dart';
 import '../../../core/config/app_colors.dart';
-import '../../../core/config/komet_settings.dart';
+import '../../../core/config/flux_settings.dart';
 import '../../../backend/models/chat_folder.dart';
 import '../../../backend/modules/account.dart';
 import '../../../backend/modules/chats.dart';
@@ -769,8 +769,8 @@ class _ChatListScreenState extends State<ChatListScreen>
     DraftStore.instance.revision.addListener(_onDraftsChanged);
     AppStories.current.addListener(_onStoriesEnabledChanged);
     storiesModule.storiesChanged.addListener(_onStoriesDataChanged);
-    KometSettings.hideAllChatsFolder.addListener(_requestReload);
-    KometSettings.showHiddenChats.addListener(_requestReload);
+    FluxSettings.hideAllChatsFolder.addListener(_requestReload);
+    FluxSettings.showHiddenChats.addListener(_requestReload);
     ContactsModule.revision.addListener(_requestReload);
     FoldersModule.revision.addListener(_requestReload);
     bannersModule.activeBanner.addListener(_onActiveInformerChanged);
@@ -964,7 +964,7 @@ class _ChatListScreenState extends State<ChatListScreen>
       final loadedChats = await chats.getChats(
         p.id,
         includeHidden:
-            widget.archiveMode || KometSettings.showHiddenChats.value,
+            widget.archiveMode || FluxSettings.showHiddenChats.value,
       );
       final archivedIds = ArchivedChatsStore.instance.archivedChatIds(p.id);
       var archivedCount = 0;
@@ -993,7 +993,7 @@ class _ChatListScreenState extends State<ChatListScreen>
         final hasRealFolders = folders.any(
           (f) => !FoldersModule.isAllChatsFolder(f),
         );
-        if (KometSettings.hideAllChatsFolder.value && hasRealFolders) {
+        if (FluxSettings.hideAllChatsFolder.value && hasRealFolders) {
           folders = folders
               .where((f) => !FoldersModule.isAllChatsFolder(f))
               .toList();
@@ -1474,8 +1474,8 @@ class _ChatListScreenState extends State<ChatListScreen>
     DraftStore.instance.revision.removeListener(_onDraftsChanged);
     AppStories.current.removeListener(_onStoriesEnabledChanged);
     storiesModule.storiesChanged.removeListener(_onStoriesDataChanged);
-    KometSettings.hideAllChatsFolder.removeListener(_requestReload);
-    KometSettings.showHiddenChats.removeListener(_requestReload);
+    FluxSettings.hideAllChatsFolder.removeListener(_requestReload);
+    FluxSettings.showHiddenChats.removeListener(_requestReload);
     ContactsModule.revision.removeListener(_requestReload);
     FoldersModule.revision.removeListener(_requestReload);
     bannersModule.activeBanner.removeListener(_onActiveInformerChanged);
@@ -3614,7 +3614,7 @@ class _ChatListScreenState extends State<ChatListScreen>
     if (p == null) return;
     final all = await chats.getChats(
       p.id,
-      includeHidden: KometSettings.showHiddenChats.value,
+      includeHidden: FluxSettings.showHiddenChats.value,
     );
     final targets = all
         .where((c) => c.unreadCount > 0)

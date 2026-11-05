@@ -17,7 +17,7 @@ import '../../widgets/section_header.dart';
 import '../../widgets/settings_card.dart';
 import '../../widgets/small_spinner.dart';
 
-const String kWebPushSiteUrl = 'https://push.komet.pw';
+const String kWebPushSiteUrl = 'https://push.flux.pw';
 
 enum _Stage { loading, intro, waiting, password, ready }
 

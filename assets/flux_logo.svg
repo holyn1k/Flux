@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="fluxGradTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#1E88E5"/>
+    </linearGradient>
+    <linearGradient id="fluxGradMid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C4DFF"/>
+      <stop offset="100%" stop-color="#651FFF"/>
+    </linearGradient>
+    <linearGradient id="fluxGradStem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E88E5"/>
+      <stop offset="50%" stop-color="#651FFF"/>
+      <stop offset="100%" stop-color="#E040FB"/>
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1E88E5" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#softGlow)">
+    <!-- Vertical Stem -->
+    <path d="M140 100 L210 60 L210 410 L140 450 Z" fill="url(#fluxGradStem)"/>
+    <!-- Top Ribbon / Arm -->
+    <path d="M210 60 L380 60 L330 140 L210 140 Z" fill="url(#fluxGradTop)"/>
+    <path d="M380 60 L410 100 L330 140 Z" fill="#00B0FF" opacity="0.8"/>
+    <!-- Middle Ribbon / Folded Crossbar -->
+    <path d="M210 200 L330 200 L290 270 L210 270 Z" fill="url(#fluxGradMid)"/>
+    <path d="M330 200 L350 235 L290 270 Z" fill="#7C4DFF" opacity="0.7"/>
+    <!-- 3D Bevel Edge -->
+    <path d="M140 100 L210 60 L210 90 L140 130 Z" fill="#FFFFFF" opacity="0.25"/>
+  </g>
+</svg>

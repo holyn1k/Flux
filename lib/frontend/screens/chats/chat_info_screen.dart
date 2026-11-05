@@ -8,7 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:komet/main.dart';
+import 'package:flux/main.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../contacts/edit_contact_sheet.dart';
 import '../../../backend/modules/complaints.dart';
@@ -37,7 +37,7 @@ import '../../widgets/custom_notification.dart';
 import '../../widgets/formatted_message_text.dart';
 import '../../widgets/reload_on_reconnect.dart';
 import '../../widgets/glossy_pill.dart';
-import '../../widgets/komet_avatar.dart';
+import '../../widgets/flux_avatar.dart';
 import '../../widgets/profile_header_scroll.dart';
 import '../../widgets/profile_hero.dart';
 import '../../widgets/swipe_route.dart';
@@ -1079,7 +1079,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen>
     }
     final url = _avatarPages.isNotEmpty ? _avatarPages.first : widget.imageUrl;
     if (url.isEmpty) {
-      return KometAvatar(
+      return FluxAvatar(
         name: widget.name,
         size: _headerAvatarSize,
         fontSize: 36,

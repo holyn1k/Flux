@@ -29,8 +29,8 @@ class NfcExchangeService {
   NfcExchangeService._();
   static final NfcExchangeService instance = NfcExchangeService._();
 
-  static const MethodChannel _method = MethodChannel('ru.komet.app/nfc');
-  static const EventChannel _events = EventChannel('ru.komet.app/nfc_events');
+  static const MethodChannel _method = MethodChannel('mishagin.flux.com/nfc');
+  static const EventChannel _events = EventChannel('mishagin.flux.com/nfc_events');
 
   bool get _supported => Platform.isAndroid;
 

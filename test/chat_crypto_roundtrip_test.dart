@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komet_crypto/komet_crypto.dart' as kc;
+import 'package:komet_crypto/flux_crypto.dart' as kc;
 
-const _libPath = 'build/linux/x64/debug/bundle/lib/libkomet_crypto.so';
+const _libPath = 'build/linux/x64/debug/bundle/lib/libflux_crypto.so';
 
 void main() {
   if (!File(_libPath).existsSync()) {
@@ -86,7 +86,7 @@ const List<int> _tinyPng = [
 void _imageTests() {
   late Directory tmp;
 
-  setUp(() => tmp = Directory.systemTemp.createTempSync('komet_img'));
+  setUp(() => tmp = Directory.systemTemp.createTempSync('flux_img'));
   tearDown(() => tmp.deleteSync(recursive: true));
 
   File writePlain() =>
