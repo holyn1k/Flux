@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Flux</title>
+  <desc id="desc">Flux messaging logo: a rounded square app icon with a speech bubble and subtle flowing blue-violet strokes.</desc>
+  <defs>
+    <linearGradient id="flow" x1="60" y1="70" x2="450" y2="450" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E88E5"/>
+      <stop offset=".52" stop-color="#72B9E8"/>
+      <stop offset="1" stop-color="#A88BEA"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="90" y1="56" x2="400" y2="455" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F3F7FC"/>
+    </linearGradient>
+    <filter id="shadow" x="24" y="24" width="464" height="464" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#23364D" flood-opacity=".14"/>
+    </filter>
+    <clipPath id="iconClip"><rect x="48" y="48" width="416" height="416" rx="112"/></clipPath>
+  </defs>
+  <g filter="url(#shadow)"><rect x="48" y="48" width="416" height="416" rx="112" fill="url(#glass)"/></g>
+  <g clip-path="url(#iconClip)" fill="none" stroke="url(#flow)" stroke-linecap="round" opacity=".55">
+    <path d="M63 164c56-68 100-69 145-5s81 65 128 8 83-63 143 1" stroke-width="18"/>
+    <path d="M45 336c54-55 102-57 150-3s87 56 135 3 82-57 137-10" stroke-width="14" opacity=".7"/>
+    <path d="M115 53c-29 74-23 121 18 153s44 72 8 121-40 89-11 137" stroke-width="12" opacity=".52"/>
+    <path d="M386 48c-37 67-35 111 5 145s48 78 19 124-32 89-2 147" stroke-width="12" opacity=".5"/>
+  </g>
+  <path d="M155 203c0-53 43-96 96-96h36c53 0 96 43 96 96v61c0 53-43 96-96 96h-79l-70 48 18-75c-1-8-1-15-1-23v-107Z" fill="#FFFFFF" fill-opacity=".9" stroke="#2C3E50" stroke-width="15" stroke-linejoin="round"/>
+  <text x="255" y="263" text-anchor="middle" dominant-baseline="middle" fill="#1A1A1A" font-family="Inter, Outfit, Arial, sans-serif" font-size="68" font-weight="600" letter-spacing="-4">flux</text>
+</svg>
