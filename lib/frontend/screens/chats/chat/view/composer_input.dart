@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'package:komet/backend/modules/messages.dart';
-import 'package:komet/core/config/app_chat_chrome.dart';
-import 'package:komet/core/config/app_colors.dart';
-import 'package:komet/core/config/app_composer_background.dart';
-import 'package:komet/core/config/app_composer_style.dart';
-import 'package:komet/core/config/app_frost.dart';
-import 'package:komet/frontend/screens/chats/chat/upload_status.dart';
-import 'package:komet/frontend/screens/chats/chat/video_note_controller.dart';
-import 'package:komet/frontend/screens/chats/chat/voice_record_controller.dart';
-import 'package:komet/frontend/widgets/composer_morph_icon.dart';
-import 'package:komet/frontend/widgets/glossy_pill.dart';
-import 'package:komet/frontend/widgets/liquid_glass.dart';
-import 'package:komet/frontend/widgets/rich_message_controller.dart';
+import 'package:flux/backend/modules/messages.dart';
+import 'package:flux/core/config/app_chat_chrome.dart';
+import 'package:flux/core/config/app_colors.dart';
+import 'package:flux/core/config/app_composer_background.dart';
+import 'package:flux/core/config/app_composer_style.dart';
+import 'package:flux/core/config/app_frost.dart';
+import 'package:flux/frontend/screens/chats/chat/upload_status.dart';
+import 'package:flux/frontend/screens/chats/chat/video_note_controller.dart';
+import 'package:flux/frontend/screens/chats/chat/voice_record_controller.dart';
+import 'package:flux/frontend/widgets/composer_morph_icon.dart';
+import 'package:flux/frontend/widgets/glossy_pill.dart';
+import 'package:flux/frontend/widgets/liquid_glass.dart';
+import 'package:flux/frontend/widgets/rich_message_controller.dart';
 
 class ComposerInputBar extends StatelessWidget {
   const ComposerInputBar({

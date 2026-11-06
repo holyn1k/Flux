@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.nfc.cardemulation.HostApduService
 import android.os.Bundle

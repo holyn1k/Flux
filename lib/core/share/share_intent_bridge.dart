@@ -14,8 +14,8 @@ class ShareIntentBridge {
   ShareIntentBridge._();
   static final ShareIntentBridge instance = ShareIntentBridge._();
 
-  static const _method = MethodChannel('ru.komet.app/share');
-  static const _events = EventChannel('ru.komet.app/share_events');
+  static const _method = MethodChannel('mishagin.flux.com/share');
+  static const _events = EventChannel('mishagin.flux.com/share_events');
   static const _retryDelay = Duration(milliseconds: 300);
   static const _maxRetries = 100;
 
@@ -85,7 +85,7 @@ class ShareIntentBridge {
     final payload = _pending;
     if (payload == null || _presenting) return;
 
-    final context = KometApp.navigatorKey.currentContext;
+    final context = FluxApp.navigatorKey.currentContext;
     if (!_ready || context == null || api.state != SessionState.online) {
       if (_retriesLeft <= 0) {
         _pending = null;

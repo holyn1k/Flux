@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'package:komet/main.dart';
-import 'package:komet/backend/modules/chats.dart';
-import 'package:komet/backend/modules/contacts.dart';
-import 'package:komet/backend/modules/messages.dart' show ContactCache;
-import 'package:komet/core/storage/app_database.dart';
-import 'package:komet/core/storage/token_storage.dart';
-import 'package:komet/frontend/screens/contacts/contact_sheet_common.dart';
-import 'package:komet/frontend/widgets/custom_notification.dart';
-import 'package:komet/frontend/widgets/komet_avatar.dart';
-import 'package:komet/l10n/app_localizations.dart';
+import 'package:flux/main.dart';
+import 'package:flux/backend/modules/chats.dart';
+import 'package:flux/backend/modules/contacts.dart';
+import 'package:flux/backend/modules/messages.dart' show ContactCache;
+import 'package:flux/core/storage/app_database.dart';
+import 'package:flux/core/storage/token_storage.dart';
+import 'package:flux/frontend/screens/contacts/contact_sheet_common.dart';
+import 'package:flux/frontend/widgets/custom_notification.dart';
+import 'package:flux/frontend/widgets/flux_avatar.dart';
+import 'package:flux/l10n/app_localizations.dart';
 
 class _Candidate {
   final int id;
@@ -281,7 +281,7 @@ class _AddMembersCardState extends State<_AddMembersCard> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
-            KometAvatar(name: c.name, imageUrl: c.avatarUrl, size: 42),
+            FluxAvatar(name: c.name, imageUrl: c.avatarUrl, size: 42),
             const SizedBox(width: 14),
             Expanded(
               child: Text(
@@ -424,7 +424,7 @@ class _InviteLinkCard extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
                     child: Row(
                       children: [
-                        KometAvatar(name: title, imageUrl: avatarUrl, size: 40),
+                        FluxAvatar(name: title, imageUrl: avatarUrl, size: 40),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(

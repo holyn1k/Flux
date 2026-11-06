@@ -9,23 +9,23 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:komet/backend/modules/contacts.dart';
-import 'package:komet/core/config/app_frost.dart';
-import 'package:komet/core/config/app_nav_pill_style.dart';
-import 'package:komet/core/config/app_visual_style.dart';
-import 'package:komet/core/media/gallery_source.dart';
-import 'package:komet/core/media/video_transcoder.dart';
-import 'package:komet/core/utils/format.dart';
-import 'package:komet/frontend/widgets/attachment/contact_picker_page.dart';
-import 'package:komet/frontend/widgets/attachment/media_preview_screen.dart';
-import 'package:komet/frontend/widgets/attachment/photo_editor.dart';
-import 'package:komet/frontend/widgets/attachment/photo_hero.dart';
-import 'package:komet/frontend/widgets/attachment/video_edit.dart';
-import 'package:komet/frontend/widgets/attachment/video_preview_screen.dart';
-import 'package:komet/frontend/widgets/custom_notification.dart';
-import 'package:komet/frontend/widgets/sheet_helpers.dart';
-import 'package:komet/frontend/widgets/sliding_pill_nav.dart';
-import 'package:komet/l10n/app_localizations.dart';
+import 'package:flux/backend/modules/contacts.dart';
+import 'package:flux/core/config/app_frost.dart';
+import 'package:flux/core/config/app_nav_pill_style.dart';
+import 'package:flux/core/config/app_visual_style.dart';
+import 'package:flux/core/media/gallery_source.dart';
+import 'package:flux/core/media/video_transcoder.dart';
+import 'package:flux/core/utils/format.dart';
+import 'package:flux/frontend/widgets/attachment/contact_picker_page.dart';
+import 'package:flux/frontend/widgets/attachment/media_preview_screen.dart';
+import 'package:flux/frontend/widgets/attachment/photo_editor.dart';
+import 'package:flux/frontend/widgets/attachment/photo_hero.dart';
+import 'package:flux/frontend/widgets/attachment/video_edit.dart';
+import 'package:flux/frontend/widgets/attachment/video_preview_screen.dart';
+import 'package:flux/frontend/widgets/custom_notification.dart';
+import 'package:flux/frontend/widgets/sheet_helpers.dart';
+import 'package:flux/frontend/widgets/sliding_pill_nav.dart';
+import 'package:flux/l10n/app_localizations.dart';
 
 import '../small_spinner.dart';
 
@@ -1078,7 +1078,7 @@ class _CameraTile extends StatefulWidget {
 }
 
 class _CameraTileState extends State<_CameraTile> with WidgetsBindingObserver {
-  static const String _askedKey = 'komet_camera_permission_asked';
+  static const String _askedKey = 'flux_camera_permission_asked';
 
   CameraController? _controller;
   bool _starting = false;

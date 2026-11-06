@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api.dart';
-import '../../core/config/komet_settings.dart';
+import '../../core/config/flux_settings.dart';
 import '../../core/contacts/device_contacts_service.dart';
 import '../../core/protocol/opcode_map.dart';
 import '../../core/protocol/packet.dart';
@@ -737,7 +737,7 @@ class MessagesModule {
       }
     }
 
-    final toSave = KometSettings.viewRedacted.value && results.isNotEmpty
+    final toSave = FluxSettings.viewRedacted.value && results.isNotEmpty
         ? await _mergeEditHistory(accountId, chatId, results)
         : results;
 

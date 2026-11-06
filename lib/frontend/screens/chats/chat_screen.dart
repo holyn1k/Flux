@@ -9,24 +9,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:komet/backend/modules/chat_preview.dart';
-import 'package:komet/backend/modules/chats.dart';
-import 'package:komet/backend/modules/comments.dart';
-import 'package:komet/backend/modules/upload_service.dart';
-import 'package:komet/backend/modules/webapp.dart';
-import 'package:komet/frontend/screens/webapp/open_mini_app.dart';
-import 'package:komet/frontend/widgets/sending_clock_icon.dart';
-import 'package:komet/core/media/desktop_video_probe.dart';
-import 'package:komet/core/media/video_transcoder.dart';
-import 'package:komet/core/media/gallery_source.dart';
-import 'package:komet/core/utils/format.dart';
-import 'package:komet/frontend/screens/chats/chat_info_screen.dart';
-import 'package:komet/frontend/screens/contacts/open_contact_profile.dart';
-import 'package:komet/frontend/screens/chats/chat_list_screen.dart';
-import 'package:komet/frontend/screens/chats/poll_create_screen.dart';
-import 'package:komet/frontend/widgets/animated_text_swap.dart';
-import 'package:komet/frontend/widgets/custom_notification.dart';
-import 'package:komet/frontend/widgets/chat_menu_overlay.dart';
+import 'package:flux/backend/modules/chat_preview.dart';
+import 'package:flux/backend/modules/chats.dart';
+import 'package:flux/backend/modules/comments.dart';
+import 'package:flux/backend/modules/upload_service.dart';
+import 'package:flux/backend/modules/webapp.dart';
+import 'package:flux/frontend/screens/webapp/open_mini_app.dart';
+import 'package:flux/frontend/widgets/sending_clock_icon.dart';
+import 'package:flux/core/media/desktop_video_probe.dart';
+import 'package:flux/core/media/video_transcoder.dart';
+import 'package:flux/core/media/gallery_source.dart';
+import 'package:flux/core/utils/format.dart';
+import 'package:flux/frontend/screens/chats/chat_info_screen.dart';
+import 'package:flux/frontend/screens/contacts/open_contact_profile.dart';
+import 'package:flux/frontend/screens/chats/chat_list_screen.dart';
+import 'package:flux/frontend/screens/chats/poll_create_screen.dart';
+import 'package:flux/frontend/widgets/animated_text_swap.dart';
+import 'package:flux/frontend/widgets/custom_notification.dart';
+import 'package:flux/frontend/widgets/chat_menu_overlay.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../../main.dart';
 import '../../../l10n/app_localizations.dart';
@@ -85,10 +85,10 @@ import 'chat/view/shimmer_loading.dart';
 import '../../../core/config/app_commands.dart';
 import '../../../core/config/app_visual_style.dart';
 import '../../../core/config/app_chat_chrome.dart';
-import 'package:komet/core/config/app_composer_background.dart';
-import 'package:komet/core/config/app_frost.dart';
-import 'package:komet/core/config/app_composer_style.dart';
-import '../../../core/config/komet_settings.dart';
+import 'package:flux/core/config/app_composer_background.dart';
+import 'package:flux/core/config/app_frost.dart';
+import 'package:flux/core/config/app_composer_style.dart';
+import '../../../core/config/flux_settings.dart';
 import '../../../models/attachment.dart';
 import '../../../models/contact_info.dart';
 import '../../../models/sticker.dart';
@@ -938,7 +938,7 @@ class _ChatScreenState extends State<ChatScreen>
       _myId,
       widget.chatId,
       limit: 20,
-      onlyVisible: !KometSettings.viewDeleted.value,
+      onlyVisible: !FluxSettings.viewDeleted.value,
     );
     if (!mounted) return;
     if (firstRows.isNotEmpty) {
@@ -2872,7 +2872,7 @@ class _ChatScreenState extends State<ChatScreen>
     final idx = _messages.indexWhere((m) => m.id == message.id);
     if (idx != -1) {
       final old = _messages[idx];
-      final newHistory = KometSettings.viewRedacted.value
+      final newHistory = FluxSettings.viewRedacted.value
           ? CachedMessage.appendEditHistory(
               old.editHistory,
               old.text,
@@ -3640,7 +3640,7 @@ class _ChatScreenState extends State<ChatScreen>
         _myId,
         widget.chatId,
       );
-      if (KometSettings.viewDeleted.value) {
+      if (FluxSettings.viewDeleted.value) {
         await chats.reconcileDeletedFromFetch(
           _myId,
           widget.chatId,
@@ -3651,7 +3651,7 @@ class _ChatScreenState extends State<ChatScreen>
         _myId,
         widget.chatId,
         limit: 100,
-        onlyVisible: !KometSettings.viewDeleted.value,
+        onlyVisible: !FluxSettings.viewDeleted.value,
       );
       final decoded = await CachedMessage.fromDbRowsAsync(rows);
       if (mounted) _applyMergedMessages(decoded);

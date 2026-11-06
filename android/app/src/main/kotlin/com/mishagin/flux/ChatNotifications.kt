@@ -1,10 +1,10 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.content.Intent
 import io.flutter.plugin.common.EventChannel
 
 object ChatNotifications {
-    const val EXTRA_CHAT = "komet_chat"
+    const val EXTRA_CHAT = "flux_chat"
 
     @Volatile
     var activeChatId: Long = 0L

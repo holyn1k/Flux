@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:komet_crypto/komet_crypto.dart' as kc;
+import 'package:komet_crypto/flux_crypto.dart' as kc;
 
 import '../storage/chat_encryption_store.dart';
 import '../utils/logger.dart';
@@ -47,7 +47,7 @@ class ChatCryptoService {
     } catch (e) {
       _init = null;
       _unavailable = true;
-      logger.w('komet_crypto init failed: $e');
+      logger.w('flux_crypto init failed: $e');
       return false;
     }
   }

@@ -9,7 +9,7 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get loginTitle => 'Войдите в Komet';
+  String get loginTitle => 'Войдите в Flux';
 
   @override
   String get loginSubtitle =>
@@ -144,7 +144,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get codeConfirmation2faWarning =>
-      'По умолчанию код приходит в МАХ. Если код не приходит по SMS - не заходите в Komet/MAX 30 минут, и попробуйте заново.';
+      'По умолчанию код приходит в МАХ. Если код не приходит по SMS - не заходите в Flux/MAX 30 минут, и попробуйте заново.';
 
   @override
   String get proxySettingsTitle => 'Прокси';
@@ -802,7 +802,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get devicesTitle => 'Устройства';
 
   @override
-  String get devicesPromoTitle => 'Устройства в Komet';
+  String get devicesPromoTitle => 'Устройства в Flux';
 
   @override
   String get devicesPromoSubtitle => 'Кто имеет доступ к вашему аккаунту?';
@@ -1014,8 +1014,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appearancePreviewNotBad => 'Вполне неплохо!';
 
   @override
-  String get callKometDetectedNotification =>
-      'Этот человек использует Komet! :3';
+  String get callFluxDetectedNotification =>
+      'Этот человек использует Flux! :3';
 
   @override
   String get callStatusConnecting => 'Соединение...';
@@ -1057,7 +1057,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get callTooltipExpand => 'Развернуть';
 
   @override
-  String get callTooltipKometHub => 'Komet';
+  String get callTooltipFluxHub => 'Flux';
 
   @override
   String get callInfoTitle => 'О звонке';
@@ -1240,7 +1240,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get callInfoNoDataYet => 'Данные появятся после соединения…';
 
   @override
-  String get hubTitleMenu => 'Komet';
+  String get hubTitleMenu => 'Flux';
 
   @override
   String get hubChatPageTitle => 'Анонимный чат';
@@ -2759,7 +2759,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get webPushIntro =>
-      'На iOS у Комета нет обычных пушей: Apple выдаёт токен уведомлений только приложениям, подписанным сертификатом разработчика, а sideload-сборка такого не получает.\n\nОбход — веб-приложение на экране «Домой». Уведомления шлёт сам сервер MAX через Apple, а показывает их отдельная иконка.\n\nДля этого нужна веб-сессия. Комет создаст её и подтвердит сам, с этого же устройства — вводить номер и код не придётся.';
+      'На iOS у Флакса нет обычных пушей: Apple выдаёт токен уведомлений только приложениям, подписанным сертификатом разработчика, а sideload-сборка такого не получает.\n\nОбход — веб-приложение на экране «Домой». Уведомления шлёт сам сервер MAX через Apple, а показывает их отдельная иконка.\n\nДля этого нужна веб-сессия. Флакс создаст её и подтвердит сам, с этого же устройства — вводить номер и код не придётся.';
 
   @override
   String get webPushConfirm => 'Продолжить';
@@ -2781,7 +2781,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get webPushInstallBody =>
-      'Откройте push.komet.pw в Safari, добавьте на экран «Домой» и запустите появившуюся иконку. Из вкладки браузера уведомления не работают — так устроена iOS.\n\nВ приложении разрешите уведомления, создайте подписку и нажмите «Открыть Комет». Дальше подписка зарегистрируется сама.';
+      'Откройте push.flux.pw в Safari, добавьте на экран «Домой» и запустите появившуюся иконку. Из вкладки браузера уведомления не работают — так устроена iOS.\n\nВ приложении разрешите уведомления, создайте подписку и нажмите «Открыть Флакс». Дальше подписка зарегистрируется сама.';
 
   @override
   String get webPushLinkedTitle => 'Уведомления подключены';
@@ -2791,7 +2791,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Подписка зарегистрирована на сервере. Не удаляйте иконку с экрана «Домой» — вместе с ней пропадут уведомления.\n\nЕсли пуши перестанут приходить, откройте приложение и свяжите заново: Apple иногда меняет адрес подписки.';
 
   @override
-  String get webPushOpenSite => 'Открыть push.komet.pw';
+  String get webPushOpenSite => 'Открыть push.flux.pw';
 
   @override
   String get webPushSignOut => 'Отключить уведомления';
@@ -2813,7 +2813,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get webPushWaitingBody =>
-      'Комет подтверждает вход веб-сессии с этого устройства. Обычно занимает несколько секунд.';
+      'Флакс подтверждает вход веб-сессии с этого устройства. Обычно занимает несколько секунд.';
 
   @override
   String get webPushNeedsOnline =>

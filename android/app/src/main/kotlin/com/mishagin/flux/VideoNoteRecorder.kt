@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.Manifest
 import android.content.Context

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komet/frontend/widgets/informer_banner_tile.dart';
-import 'package:komet/models/animoji.dart';
-import 'package:komet/models/informer_banner.dart';
+import 'package:flux/frontend/widgets/informer_banner_tile.dart';
+import 'package:flux/models/animoji.dart';
+import 'package:flux/models/informer_banner.dart';
 
 const _banner = InformerBanner(
   id: 'synthetic-banner',

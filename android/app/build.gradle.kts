@@ -17,7 +17,7 @@ if (hasReleaseSigning) {
 }
 
 android {
-    namespace = "ru.komet.app"
+    namespace = "mishagin.flux.com"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -32,7 +32,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "ru.komet.app"
+        applicationId = "mishagin.flux.com"
         minSdk = maxOf(flutter.minSdkVersion, 23)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -57,7 +57,7 @@ android {
         create("komet") {
             dimension = "distribution"
             isDefault = true
-            applicationId = "ru.komet.app"
+            applicationId = "mishagin.flux.com"
         }
         create("oneme") {
             dimension = "distribution"

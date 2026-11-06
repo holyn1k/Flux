@@ -38,7 +38,7 @@ class VpnBypassService {
   static const String prefKey = 'dev_vpn_bypass';
 
   static const MethodChannel _channel = MethodChannel(
-    'ru.komet.app/vpn_bypass',
+    'mishagin.flux.com/vpn_bypass',
   );
 
   bool _bound = false;

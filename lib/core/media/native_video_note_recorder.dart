@@ -16,7 +16,7 @@ class VideoNoteAccess {
 }
 
 class NativeVideoNoteRecorder {
-  static const _channel = MethodChannel('ru.komet.app/video_note');
+  static const _channel = MethodChannel('mishagin.flux.com/video_note');
 
   int? textureId;
   bool hasFlash = false;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komet/frontend/screens/chats/chat/chat_controller.dart';
-import 'package:komet/frontend/screens/chats/chat/retain_offset_physics.dart';
+import 'package:flux/frontend/screens/chats/chat/chat_controller.dart';
+import 'package:flux/frontend/screens/chats/chat/retain_offset_physics.dart';
 
 const double _itemHeight = 60;
 const double _newestHeight = 84;

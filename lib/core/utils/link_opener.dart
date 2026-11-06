@@ -23,7 +23,7 @@ bool leavesWebView(String? scheme) {
   return !_webViewSchemes.contains(scheme.toLowerCase());
 }
 
-const Set<String> _appSchemes = {'komet', 'max'};
+const Set<String> _appSchemes = {'flux', 'max'};
 
 Future<void> openExternalUrl(BuildContext context, String url) async {
   final appUri = Uri.tryParse(url.trim());

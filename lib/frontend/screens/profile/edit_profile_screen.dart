@@ -4,10 +4,10 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../core/storage/app_database.dart';
 import '../../../core/utils/image_utils.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../main.dart' show accountModule, fileUploader, KometApp;
+import '../../../main.dart' show accountModule, fileUploader, FluxApp;
 import '../../widgets/connection_status.dart';
 import '../../widgets/custom_notification.dart';
-import '../../widgets/komet_avatar.dart';
+import '../../widgets/flux_avatar.dart';
 import '../../widgets/small_spinner.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -70,7 +70,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _avatarUrl = newProfile.baseUrl;
       _photoId = newProfile.photoId;
       if (!mounted) return;
-      KometApp.stateOf(context)?.notifyProfileUpdate();
+      FluxApp.stateOf(context)?.notifyProfileUpdate();
       if (mounted) {
         showCustomNotification(context, 'Имя сохранено');
         setState(() => _isSaving = false);
@@ -130,7 +130,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _photoId = newProfile.photoId;
         _isSaving = false;
       });
-      KometApp.stateOf(context)?.notifyProfileUpdate();
+      FluxApp.stateOf(context)?.notifyProfileUpdate();
       showCustomNotification(context, 'Аватарка обновлена');
     } catch (e) {
       if (!mounted) return;
@@ -147,7 +147,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _avatarUrl = newProfile.baseUrl;
       _photoId = newProfile.photoId;
       if (!mounted) return;
-      KometApp.stateOf(context)?.notifyProfileUpdate();
+      FluxApp.stateOf(context)?.notifyProfileUpdate();
       if (mounted) {
         showCustomNotification(context, 'Фото удалено');
         setState(() => _isSaving = false);
@@ -210,7 +210,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             width: 2.5,
                           ),
                         ),
-                        child: KometAvatar(
+                        child: FluxAvatar(
                           name: _firstNameController.text,
                           imageUrl: _avatarUrl,
                           size: 88,

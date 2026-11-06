@@ -237,9 +237,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     });
     _remoteStreamSub = session.remoteStreamStream.listen(_attachStream);
     _tileStreamSub = session.participantStreamUpdates.listen(_onTileStream);
-    _fluxSub = session.peerKometDetected.listen((_) => _showFluxBadge());
+    _fluxSub = session.peerFluxDetected.listen((_) => _showFluxBadge());
     _chatSub = session.chatMessages.listen(_onChatMessage);
-    if (session.peerIsKomet) {
+    if (session.peerIsFlux) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _showFluxBadge());
     }
     final existing = session.remoteStream;
@@ -1007,7 +1007,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (_session?.peerIsKomet == true)
+                  if (_session?.peerIsFlux == true)
                     IconButton(
                       onPressed: _openFluxHub,
                       tooltip: 'Flux Hub',

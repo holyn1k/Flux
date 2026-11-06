@@ -9,7 +9,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../../core/cache/self_presence.dart';
 import '../../../core/config/app_colors.dart';
-import '../../../core/config/komet_settings.dart';
+import '../../../core/config/flux_settings.dart';
 import '../../../core/config/app_show_extra_info.dart';
 import '../../../core/storage/app_database.dart';
 import '../../../core/utils/format.dart';
@@ -20,7 +20,7 @@ import '../../widgets/animated_slash_icon.dart';
 import '../../widgets/avatar_history_screen.dart';
 import '../../widgets/connection_status.dart';
 import '../../widgets/info_action_sheet.dart';
-import '../../widgets/komet_avatar.dart';
+import '../../widgets/flux_avatar.dart';
 import '../../widgets/profile_header_scroll.dart';
 import '../../widgets/settings_card.dart';
 import '../../widgets/sheet_helpers.dart';
@@ -42,7 +42,7 @@ import 'devices_screen.dart';
 import '../../widgets/spectrum_tint.dart';
 import 'edit_profile_screen.dart';
 import 'info_screen.dart';
-import 'komet_settings_screen.dart';
+import 'flux_settings_screen.dart';
 import 'notifications_screen.dart';
 import 'security_screen.dart';
 import 'spoof_screen.dart';
@@ -79,7 +79,7 @@ class _SettingsTabState extends State<SettingsTab> with SpectrumSurface {
     super.initState();
     _loadProfile();
     _loadAppVersion();
-    final appState = KometApp.stateOf(context);
+    final appState = FluxApp.stateOf(context);
     if (appState != null) {
       _profileUpdateSub = appState.profileUpdateStream.listen((_) {
         if (mounted) _loadProfile();
@@ -320,7 +320,7 @@ class _SettingsTabState extends State<SettingsTab> with SpectrumSurface {
   }
 
   Future<void> _doLogout() async {
-    final navState = KometApp.navigatorKey.currentState;
+    final navState = FluxApp.navigatorKey.currentState;
     try {
       await accountModule.logout();
     } catch (e) {
@@ -359,7 +359,7 @@ class _SettingsTabState extends State<SettingsTab> with SpectrumSurface {
     final hasPhoto = (_profile!.baseUrl ?? '').isNotEmpty;
 
     return ValueListenableBuilder<bool>(
-      valueListenable: KometSettings.selfOnlineCheck,
+      valueListenable: FluxSettings.selfOnlineCheck,
       builder: (context, statusEnabled, _) {
         final collapsedH = topPad + (statusEnabled ? 268.0 : 242.0);
         final expandedH = hasPhoto
@@ -617,18 +617,18 @@ class _SettingsTabState extends State<SettingsTab> with SpectrumSurface {
                         ),
                         _SettingsItem(
                           leading: Image.asset(
-                            'assets/komet.png',
+                            'assets/flux.png',
                             width: 22,
                             height: 22,
                             color: cs.onSurfaceVariant,
                           ),
-                          label: 'Komet',
+                          label: 'Flux',
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const KometSettingsScreen(),
+                                    const FluxSettingsScreen(),
                               ),
                             );
                           },
@@ -934,7 +934,7 @@ class _SettingsTabState extends State<SettingsTab> with SpectrumSurface {
             width: 2.5,
           ),
         ),
-        child: KometAvatar(name: name, size: 88, fontSize: 32),
+        child: FluxAvatar(name: name, size: 88, fontSize: 32),
       );
     }
     final letterFallback = ColoredBox(
@@ -1011,7 +1011,7 @@ class _SettingsTabState extends State<SettingsTab> with SpectrumSurface {
 
   Widget _buildOnlineStatus(ColorScheme cs, {Color? textColor}) {
     return ValueListenableBuilder<bool>(
-      valueListenable: KometSettings.selfOnlineCheck,
+      valueListenable: FluxSettings.selfOnlineCheck,
       builder: (context, enabled, _) {
         if (!enabled) return const SizedBox.shrink();
         return Padding(

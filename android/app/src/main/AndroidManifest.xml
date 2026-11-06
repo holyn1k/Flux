@@ -38,7 +38,7 @@
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name="ru.komet.app.MainActivity"
+            android:name="mishagin.flux.com.MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
             android:label="Komet"
@@ -104,12 +104,12 @@
             </intent-filter>
         </activity>
         <activity-alias
-            android:name="ru.komet.app.MinimalIcon"
+            android:name="mishagin.flux.com.MinimalIcon"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_minimal"
             android:label="Komet"
-            android:targetActivity="ru.komet.app.MainActivity">
+            android:targetActivity="mishagin.flux.com.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

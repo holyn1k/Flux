@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to Komet'**
+  /// **'Sign in to Flux'**
   String get loginTitle;
 
   /// No description provided for @loginSubtitle.
@@ -1994,11 +1994,11 @@ abstract class AppLocalizations {
   /// **'Not bad at all!'**
   String get appearancePreviewNotBad;
 
-  /// No description provided for @callKometDetectedNotification.
+  /// No description provided for @callFluxDetectedNotification.
   ///
   /// In en, this message translates to:
-  /// **'This person uses Komet! :3'**
-  String get callKometDetectedNotification;
+  /// **'This person uses Flux! :3'**
+  String get callFluxDetectedNotification;
 
   /// No description provided for @callStatusConnecting.
   ///
@@ -2078,11 +2078,11 @@ abstract class AppLocalizations {
   /// **'Expand'**
   String get callTooltipExpand;
 
-  /// No description provided for @callTooltipKometHub.
+  /// No description provided for @callTooltipFluxHub.
   ///
   /// In en, this message translates to:
-  /// **'Komet'**
-  String get callTooltipKometHub;
+  /// **'Flux'**
+  String get callTooltipFluxHub;
 
   /// No description provided for @callInfoTitle.
   ///
@@ -2429,7 +2429,7 @@ abstract class AppLocalizations {
   /// No description provided for @hubTitleMenu.
   ///
   /// In en, this message translates to:
-  /// **'Komet'**
+  /// **'Flux'**
   String get hubTitleMenu;
 
   /// No description provided for @hubChatPageTitle.
@@ -5219,7 +5219,7 @@ abstract class AppLocalizations {
   /// No description provided for @webPushIntro.
   ///
   /// In en, this message translates to:
-  /// **'Komet has no ordinary push on iOS: Apple issues a notification token only to apps signed with a developer certificate, and a sideloaded build never gets one.\n\nThe way around it is a web app on the Home Screen. MAX\'s own server sends the notifications through Apple, and a separate icon displays them.\n\nThat needs a web session. Komet creates one and approves it itself, from this very device — no phone number or code required.'**
+  /// **'Flux has no ordinary push on iOS: Apple issues a notification token only to apps signed with a developer certificate, and a sideloaded build never gets one.\n\nThe way around it is a web app on the Home Screen. MAX\'s own server sends the notifications through Apple, and a separate icon displays them.\n\nThat needs a web session. Flux creates one and approves it itself, from this very device — no phone number or code required.'**
   String get webPushIntro;
 
   /// No description provided for @webPushConfirm.
@@ -5255,7 +5255,7 @@ abstract class AppLocalizations {
   /// No description provided for @webPushInstallBody.
   ///
   /// In en, this message translates to:
-  /// **'Open push.komet.pw in Safari, add it to the Home Screen and launch the icon that appears. Notifications do not work from a browser tab — that is how iOS works.\n\nIn the app, allow notifications, create a subscription and tap \"Open Komet\". The subscription registers itself from there.'**
+  /// **'Open push.flux.pw in Safari, add it to the Home Screen and launch the icon that appears. Notifications do not work from a browser tab — that is how iOS works.\n\nIn the app, allow notifications, create a subscription and tap \"Open Flux\". The subscription registers itself from there.'**
   String get webPushInstallBody;
 
   /// No description provided for @webPushLinkedTitle.
@@ -5273,7 +5273,7 @@ abstract class AppLocalizations {
   /// No description provided for @webPushOpenSite.
   ///
   /// In en, this message translates to:
-  /// **'Open push.komet.pw'**
+  /// **'Open push.flux.pw'**
   String get webPushOpenSite;
 
   /// No description provided for @webPushSignOut.
@@ -5309,7 +5309,7 @@ abstract class AppLocalizations {
   /// No description provided for @webPushWaitingBody.
   ///
   /// In en, this message translates to:
-  /// **'Komet is approving the web session from this device. This usually takes a few seconds.'**
+  /// **'Flux is approving the web session from this device. This usually takes a few seconds.'**
   String get webPushWaitingBody;
 
   /// No description provided for @webPushNeedsOnline.

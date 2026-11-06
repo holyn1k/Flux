@@ -42,7 +42,7 @@ LogFilter _logFilter() {
 final logger = Logger(
   filter: _logFilter(),
   level: _minimumLogLevel(),
-  printer: KometLogPrinter(),
+  printer: FluxLogPrinter(),
   output: MultiOutput([ConsoleOutput(), DebugSessionLogOutput()]),
 );
 
@@ -115,8 +115,8 @@ AnsiColor _levelColor(Level level) {
   return AnsiColor.fg(AnsiColor.grey(0.5));
 }
 
-class KometLogPrinter extends LogPrinter {
-  KometLogPrinter({this.colors = true});
+class FluxLogPrinter extends LogPrinter {
+  FluxLogPrinter({this.colors = true});
 
   final bool colors;
 

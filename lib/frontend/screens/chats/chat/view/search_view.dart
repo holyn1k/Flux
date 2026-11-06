@@ -3,15 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'package:komet/core/config/app_animations.dart';
-import 'package:komet/core/config/app_chat_chrome.dart';
-import 'package:komet/core/utils/format.dart';
-import 'package:komet/frontend/widgets/animated_lottie_icon.dart';
-import 'package:komet/frontend/widgets/glossy_pill.dart';
-import 'package:komet/frontend/widgets/komet_avatar.dart';
-import 'package:komet/frontend/widgets/small_spinner.dart';
-import 'package:komet/frontend/screens/chats/chat/chat_search_controller.dart';
-import 'package:komet/frontend/screens/chats/chat/message_search_result.dart';
+import 'package:flux/core/config/app_animations.dart';
+import 'package:flux/core/config/app_chat_chrome.dart';
+import 'package:flux/core/utils/format.dart';
+import 'package:flux/frontend/widgets/animated_lottie_icon.dart';
+import 'package:flux/frontend/widgets/glossy_pill.dart';
+import 'package:flux/frontend/widgets/flux_avatar.dart';
+import 'package:flux/frontend/widgets/small_spinner.dart';
+import 'package:flux/frontend/screens/chats/chat/chat_search_controller.dart';
+import 'package:flux/frontend/screens/chats/chat/message_search_result.dart';
 import '../../../../../core/config/app_fonts.dart';
 
 class SearchTopBar extends StatelessWidget {
@@ -212,7 +212,7 @@ class SearchOverlay extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            KometAvatar(
+            FluxAvatar(
               name: name,
               imageUrl: senderAvatar(r.senderId),
               size: 44,

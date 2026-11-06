@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 import android.Manifest
 import android.app.Activity
@@ -20,7 +20,7 @@ import io.flutter.plugin.common.MethodChannel
 import java.util.concurrent.Executors
 
 object FkmChannel {
-    private const val NAME = "ru.komet.app/fkm"
+    private const val NAME = "mishagin.flux.com/fkm"
     const val NOTIF_PERMS_REQUEST = 7713
 
     private val main = Handler(Looper.getMainLooper())
@@ -117,7 +117,7 @@ object FkmChannel {
         val data = call.argument<Map<String, String>>("data") ?: return false
         worker.execute {
             try {
-                KometNotifier(ctx).handle(data)
+                FluxNotifier(ctx).handle(data)
                 FkmState.countDelivered(ctx)
                 FkmService.refresh(ctx)
             } catch (e: Exception) {
@@ -132,12 +132,12 @@ object FkmChannel {
         ctx: Context,
         call: MethodCall,
         tag: String,
-        action: (KometNotifier, Map<String, String>) -> Unit,
+        action: (FluxNotifier, Map<String, String>) -> Unit,
     ): Boolean {
         val data = call.argument<Map<String, String>>("data") ?: return false
         worker.execute {
             try {
-                action(KometNotifier(ctx), data)
+                action(FluxNotifier(ctx), data)
             } catch (e: Exception) {
                 Log.w("Fkm", "$tag failed: ${e.message}")
             }

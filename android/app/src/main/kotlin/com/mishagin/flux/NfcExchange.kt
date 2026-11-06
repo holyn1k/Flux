@@ -1,4 +1,4 @@
-package ru.komet.app
+package com.mishagin.flux
 
 object NfcExchange {
 

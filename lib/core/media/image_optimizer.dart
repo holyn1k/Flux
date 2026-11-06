@@ -88,7 +88,7 @@ Future<File> writePhotoJpeg(Uint8List bytes) async {
   final file = File(
     p.join(
       dir.path,
-      'komet_photo_${DateTime.now().microsecondsSinceEpoch}.jpg',
+      'flux_photo_${DateTime.now().microsecondsSinceEpoch}.jpg',
     ),
   );
   await file.writeAsBytes(bytes, flush: true);

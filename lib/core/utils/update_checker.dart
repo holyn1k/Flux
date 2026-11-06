@@ -39,9 +39,9 @@ class UpdateCheckResult {
 }
 
 abstract class UpdateChecker {
-  static const String _owner = 'KometTeam';
-  static const String _repo = 'Komet';
-  static const String _userAgent = 'KometUpdateChecker';
+  static const String _owner = 'FluxTeam';
+  static const String _repo = 'Flux';
+  static const String _userAgent = 'FluxUpdateChecker';
 
   static const String _lastCheckKey = 'update_last_check_ms';
   static const String _skippedTagKey = 'update_skipped_tag';

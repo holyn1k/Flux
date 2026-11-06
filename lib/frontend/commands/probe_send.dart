@@ -17,7 +17,7 @@ Future<File> _tempFile(String extension) async {
   return File(
     p.join(
       dir.path,
-      'komet_probe_${DateTime.now().microsecondsSinceEpoch}.$extension',
+      'flux_probe_${DateTime.now().microsecondsSinceEpoch}.$extension',
     ),
   );
 }
@@ -37,7 +37,7 @@ Future<File> buildProbeZipFile({
   List<int>? prefix,
 }) async {
   final archive = Archive();
-  final data = utf8.encode('This is a zip, not a photo. Komet probe.');
+  final data = utf8.encode('This is a zip, not a photo. Flux probe.');
   archive.addFile(ArchiveFile('not_a_photo.txt', data.length, data));
   final zip = ZipEncoder().encodeBytes(archive);
   final bytes = prefix == null ? zip : <int>[...prefix, ...zip];

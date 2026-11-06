@@ -42,7 +42,7 @@ Future<File?> reencodeAsPng(File source, String destPath) async {
 }
 
 Future<Directory> _scratchDir() async {
-  final dir = Directory('${(await getTemporaryDirectory()).path}/komet_enc');
+  final dir = Directory('${(await getTemporaryDirectory()).path}/flux_enc');
   if (!await dir.exists()) await dir.create(recursive: true);
   return dir;
 }

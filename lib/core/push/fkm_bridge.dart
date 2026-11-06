@@ -4,12 +4,12 @@ import 'package:flutter/services.dart';
 
 import '../utils/logger.dart';
 
-/// Канал к нативному сервису FKM (foreground komet messaging).
+/// Канал к нативному сервису FKM (foreground flux messaging).
 class FkmBridge {
   FkmBridge._();
   static final FkmBridge instance = FkmBridge._();
 
-  static const _method = MethodChannel('ru.komet.app/fkm');
+  static const _method = MethodChannel('mishagin.flux.com/fkm');
 
   VoidCallback? _onDisabled;
   bool _handlerSet = false;
