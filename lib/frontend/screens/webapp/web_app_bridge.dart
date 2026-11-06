@@ -27,9 +27,7 @@ abstract class WebAppEntryPoint {
   static const String fromSearch = 'from_search';
 }
 
-typedef WebAppMobileIdVerifier = Future?> Function(
-  String url,
-);
+typedef WebAppMobileIdVerifier = Future<Map<String, dynamic>?> Function(String url);
 
 typedef WebAppEmitter =
     void Function(String method, String payload, bool private);
